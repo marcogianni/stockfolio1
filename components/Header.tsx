@@ -15,11 +15,14 @@ import { PersonIcon } from '@radix-ui/react-icons'
 import { Button } from './ui/button'
 
 export default function Header() {
-  const session = useSupabase()
-  const user = session?.user
-  console.debug('Header', session)
+  const { supabase, user } = useSupabase()
+  console.debug('Header', { user, supabase })
 
   const isLoggedIn = useMemo(() => ![undefined, null].includes(user?.email), [user])
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut()
+  }
 
   return (
     <header className="supports-backdrop-blur:bg-background/60 sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
@@ -51,7 +54,7 @@ export default function Header() {
               <Button variant="outline" size="icon">
                 <PersonIcon />
               </Button>
-              <Button>Logout</Button>
+              <Button onClick={handleLogout}>Logout</Button>
             </>
           ) : (
             <LoginDialog />
