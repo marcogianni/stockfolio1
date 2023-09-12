@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useState } from "react";
+import { Cross1Icon } from "@radix-ui/react-icons";
 
 import {
   Dialog,
@@ -60,24 +61,53 @@ const registerFormSchema = z
   });
 
 export default function LoginDialog() {
+  const [open, setOpen] = useState(false);
   const [mode, setMode] = useState("login"); // login | register
 
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button>Sign Up</Button>
-      </DialogTrigger>
+  const handleClose = () => {
+    setOpen(false);
+    setTimeout(() => {
+      setMode("login");
+    }, 200);
+  };
 
-      {mode === "login" ? (
-        <FormLogin switchMode={() => setMode("register")} />
-      ) : (
-        <FormRegister switchMode={() => setMode("login")} />
-      )}
+  return (
+    <Dialog open={open}>
+      <Button onClick={() => setOpen(true)}>Sign Up</Button>
+      <DialogContent className="sm:max-w-[600px]">
+        <div className="flex items-center justify-end h-8">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleClose}
+            className="absolute"
+          >
+            <Cross1Icon />
+          </Button>
+        </div>
+        {mode === "login" ? (
+          <FormLogin
+            switchMode={() => setMode("register")}
+            handleClose={handleClose}
+          />
+        ) : (
+          <FormRegister
+            switchMode={() => setMode("login")}
+            handleClose={handleClose}
+          />
+        )}
+      </DialogContent>
     </Dialog>
   );
 }
 
-const FormLogin = ({ switchMode }: { switchMode: () => void }) => {
+const FormLogin = ({
+  switchMode,
+  handleClose,
+}: {
+  switchMode: () => void;
+  handleClose: () => void;
+}) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const supabase = createClientComponentClient<Database>();
@@ -117,80 +147,85 @@ const FormLogin = ({ switchMode }: { switchMode: () => void }) => {
     console.debug("handleSignIn", error?.message);
     router.refresh();
     setLoading(false);
+    handleClose();
   };
 
   return (
     <>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Sign in</DialogTitle>
-          <DialogDescription className="mt-16">
-            Insert your email and password used in registration and click the
-            button.
-          </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      placeholder="Email"
-                      id="email"
-                      className="col-span-3"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+      <DialogHeader>
+        <DialogTitle>Sign in</DialogTitle>
+        <DialogDescription className="mt-16">
+          Insert your email and password used in registration and click the
+          button.
+        </DialogDescription>
+      </DialogHeader>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    placeholder="Email"
+                    id="email"
+                    className="col-span-3"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      placeholder="Password"
-                      id="password"
-                      className="col-span-3"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    placeholder="Password"
+                    id="password"
+                    className="col-span-3"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <DialogFooter>
-              <div className="w-full">
-                <Button size="lg" type="submit" className="w-full">
-                  Sign in
-                </Button>
-                <Separator className="mt-3" />
-                <Button
-                  size="lg"
-                  className="w-full mt-3"
-                  variant="secondary"
-                  onClick={switchMode}
-                >
-                  Register
-                </Button>
-              </div>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
+          <DialogFooter>
+            <div className="w-full">
+              <Button size="lg" type="submit" className="w-full">
+                Sign in
+              </Button>
+              <Separator className="mt-3" />
+              <Button
+                size="lg"
+                className="w-full mt-3"
+                variant="secondary"
+                onClick={switchMode}
+              >
+                Register
+              </Button>
+            </div>
+          </DialogFooter>
+        </form>
+      </Form>
     </>
   );
 };
 
-const FormRegister = ({ switchMode }: { switchMode: () => void }) => {
+const FormRegister = ({
+  switchMode,
+  handleClose,
+}: {
+  switchMode: () => void;
+  handleClose: () => void;
+}) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const supabase = createClientComponentClient<Database>();
@@ -223,6 +258,8 @@ const FormRegister = ({ switchMode }: { switchMode: () => void }) => {
         emailRedirectTo: `${location.origin}/auth/callback`,
       },
     });
+
+    console.debug("handleSignUp", { data, error });
     if (error) {
       toast({
         title: "Error",
@@ -233,96 +270,95 @@ const FormRegister = ({ switchMode }: { switchMode: () => void }) => {
     console.debug("handleSignIn", error?.message);
     router.refresh();
     setLoading(false);
+    handleClose();
   };
 
   return (
     <>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Register</DialogTitle>
-          <DialogDescription className="mt-16">
-            Only an email is required, we ask for no further information, and it
-            is free of charge.
-          </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      placeholder="Email"
-                      id="email"
-                      className="col-span-3"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+      <DialogHeader>
+        <DialogTitle>Register</DialogTitle>
+        <DialogDescription className="mt-16">
+          Only an email is required, we ask for no further information, and it
+          is free of charge.
+        </DialogDescription>
+      </DialogHeader>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    placeholder="Email"
+                    id="email"
+                    className="col-span-3"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      placeholder="Password"
-                      id="password"
-                      className="col-span-3"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    placeholder="Password"
+                    id="password"
+                    className="col-span-3"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={form.control}
-              name="repeatPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      placeholder="Repeat Password"
-                      id="repeatPassword"
-                      className="col-span-3"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={form.control}
+            name="repeatPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    placeholder="Repeat Password"
+                    id="repeatPassword"
+                    className="col-span-3"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <DialogFooter>
-              <div className="w-full">
-                <Button type="submit" size="lg" className="w-full">
-                  Register
-                </Button>
+          <DialogFooter>
+            <div className="w-full">
+              <Button type="submit" size="lg" className="w-full">
+                Register
+              </Button>
 
-                <Separator className="mt-3" />
+              <Separator className="mt-3" />
 
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  className="w-full mt-3"
-                  onClick={switchMode}
-                >
-                  <ChevronLeftIcon className="h-4 w-4" />
-                  <span className="pl-2">Back to Sign in</span>
-                </Button>
-              </div>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="w-full mt-3"
+                onClick={switchMode}
+              >
+                <ChevronLeftIcon className="h-4 w-4" />
+                <span className="pl-2">Back to Sign in</span>
+              </Button>
+            </div>
+          </DialogFooter>
+        </form>
+      </Form>
     </>
   );
 };
