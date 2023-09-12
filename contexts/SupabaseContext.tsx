@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useLayoutEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/auth-helpers-nextjs'
 import type { Database } from '@/lib/database.types'
 import { Session, User } from '@supabase/supabase-js'

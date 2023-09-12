@@ -92,11 +92,6 @@ const FormLogin = ({ switchMode, handleClose }: { switchMode: () => void; handle
 
   function onSubmit(values: { email: string; password: string }) {
     setLoading(true)
-    console.debug('onSubmit', values)
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log('onSubmit', values)
-
     handleSignIn(values)
   }
 
@@ -146,7 +141,7 @@ const FormLogin = ({ switchMode, handleClose }: { switchMode: () => void; handle
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder="Password" id="password" className="col-span-3" {...field} />
+                  <Input type="password" placeholder="Password" id="password" className="col-span-3" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -187,11 +182,6 @@ const FormRegister = ({ switchMode, handleClose }: { switchMode: () => void; han
 
   function onSubmit(values: { email: string; password: string }) {
     setLoading(true)
-    console.debug('onSubmit', values)
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log('onSubmit', values)
-
     handleSignUp(values)
   }
 
@@ -247,7 +237,7 @@ const FormRegister = ({ switchMode, handleClose }: { switchMode: () => void; han
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder="Password" id="password" className="col-span-3" {...field} />
+                  <Input type="password" placeholder="Password" id="password" className="col-span-3" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -260,7 +250,7 @@ const FormRegister = ({ switchMode, handleClose }: { switchMode: () => void; han
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder="Repeat Password" id="repeatPassword" className="col-span-3" {...field} />
+                  <Input type="password" placeholder="Repeat Password" id="repeatPassword" className="col-span-3" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
