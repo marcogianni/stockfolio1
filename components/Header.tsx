@@ -2,10 +2,8 @@
 
 // https://www.propelauth.com/post/authentication-with-nextjs-13-and-supabase-app-router
 
-import { User, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Link from 'next/link'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import LoginDialog from '@/components/LoginDialog'
 
 import type { Database } from '@/lib/database.types'

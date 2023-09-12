@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -6,19 +7,17 @@ import type { Database } from '@/lib/database.types'
 import { Session, User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase-browser'
 
-type SupabaseContext = {
-  supabase: SupabaseClient<Database>
-}
-
 type UserSession = {
+  supabase: SupabaseClient<Database>
   userSession: Session | null
   user: User | null
 }
 
 const Context = createContext(undefined)
 
+const supabase = createClient()
+
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
-  const supabase = createClient()
   const [userSession, setUserSession] = useState<Session | null>(null)
   const [user, setUser] = useState<User | null>(null)
 
@@ -30,6 +29,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       console.log(`Supabase onAuthStateChange: ${event}`)
+      if (event === 'INITIAL_SESSION') return
       setUserSession(session)
       setUser(session?.user ?? null)
     })
@@ -39,7 +39,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const supa = {
+  const supa: UserSession = {
     supabase,
     userSession,
     user,
