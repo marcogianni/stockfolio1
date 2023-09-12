@@ -1,50 +1,50 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useLayoutEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/auth-helpers-nextjs'
 import type { Database } from '@/lib/database.types'
-
-import { useRouter } from 'next/navigation'
+import { Session, User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase-browser'
 
 type SupabaseContext = {
   supabase: SupabaseClient<Database>
 }
 
-const Context = createContext<SupabaseContext | undefined>(undefined)
+type UserSession = {
+  userSession: Session | null
+  user: User | null
+}
+
+const Context = createContext(undefined)
 
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
-  const [supabase] = useState(() => createClient())
-  const [user, setUser] = useState(null)
-  const router = useRouter()
-
-  console.debug('SupabaseProvider.supabase', { supabase, user })
+  const supabase = createClient()
+  const [userSession, setUserSession] = useState<Session | null>(null)
+  const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      console.debug('onAuthStateChange', { event, session })
-      //   router.refresh()
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserSession(session)
+      setUser(session?.user ?? null)
     })
 
-    const loadUser = async () => {
-      const { data, error } = await supabase.auth.getUser()
-      console.log('User', data.user)
-      if (data?.user) {
-        setUser(data?.user)
-        router.push('/dashboard')
-      }
-    }
-
-    loadUser()
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log(`Supabase onAuthStateChange: ${event}`)
+      setUserSession(session)
+      setUser(session?.user ?? null)
+    })
 
     return () => {
-      subscription.unsubscribe()
+      authListener.subscription
     }
   }, [])
 
-  return <Context.Provider value={{ supabase }}>{children}</Context.Provider>
+  const session = {
+    userSession,
+    user,
+  }
+
+  return <Context.Provider value={session}>{children}</Context.Provider>
 }
 
 export const useSupabase = () => {

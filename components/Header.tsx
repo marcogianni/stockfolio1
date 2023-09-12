@@ -2,7 +2,7 @@
 
 // https://www.propelauth.com/post/authentication-with-nextjs-13-and-supabase-app-router
 
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { User, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Link from 'next/link'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -10,21 +10,16 @@ import LoginDialog from '@/components/LoginDialog'
 
 import type { Database } from '@/lib/database.types'
 import { useSupabase } from '@/contexts/SupabaseContext'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
+import { PersonIcon } from '@radix-ui/react-icons'
+import { Button } from './ui/button'
 
 export default function Header() {
-  const { supabase } = useSupabase()
+  const session = useSupabase()
+  const user = session?.user
+  console.debug('Header', session)
 
-  useEffect(() => {
-    const loadUser = async () => {
-      const { data, error } = await supabase.auth.getUser()
-      console.log('User', data.user)
-    }
-
-    loadUser()
-  }, [])
-
-  console.log('Header', supabase)
+  const isLoggedIn = useMemo(() => ![undefined, null].includes(user?.email), [user])
 
   return (
     <header className="supports-backdrop-blur:bg-background/60 sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
@@ -50,12 +45,17 @@ export default function Header() {
         </div>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <ThemeSwitcher />
-          <LoginDialog />
 
-          {/* <Avatar>
-            <AvatarImage src="https://avatars.githubusercontent.com/u/55951818?v=4" />
-            <AvatarFallback>marcogianni</AvatarFallback>
-          </Avatar> */}
+          {isLoggedIn ? (
+            <>
+              <Button variant="outline" size="icon">
+                <PersonIcon />
+              </Button>
+              <Button>Logout</Button>
+            </>
+          ) : (
+            <LoginDialog />
+          )}
         </div>
       </div>
     </header>
