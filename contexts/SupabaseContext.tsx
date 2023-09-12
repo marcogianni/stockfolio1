@@ -13,11 +13,10 @@ type UserSession = {
   user: User | null
 }
 
-const Context = createContext(undefined)
-
-const supabase = createClient()
+const Context = createContext({} as UserSession)
 
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
+  const [supabase] = useState(() => createClient())
   const [userSession, setUserSession] = useState<Session | null>(null)
   const [user, setUser] = useState<User | null>(null)
 
