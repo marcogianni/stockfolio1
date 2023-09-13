@@ -74,7 +74,7 @@ export default function DialogAddStock(props: Props) {
       <DialogContent className="sm:max-w-[700px]">
         <DialogHeader>Add Stock</DialogHeader>
         <div>
-          <Input onChange={handleChangeQuery} placeholder="Search by Symbol" id="query" className="col-span-3" />
+          <Input onChange={handleChangeQuery} placeholder="Search by symbol and toggle it" id="query" className="col-span-3" />
           <DataTable columns={columns} data={state.results} />
           <Separator />
           <Input type="number" placeholder="Insert quantity" id="quantity" className="col-span-3 mt-3" />
