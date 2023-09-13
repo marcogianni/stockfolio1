@@ -2,17 +2,10 @@
 
 import DialogAddStock from '@/components/DialogAddStock'
 import Empty from '@/components/Empty'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 export default function Dashboard() {
   const [dialogOpen, setDialogOpen] = useState(false)
-  // useEffect(() => {
-  //   const loadData = async () => {
-  //     const data = await searchStock('AA')
-  //     console.log('Dashboard', data)
-  //   }
-  //   loadData()
-  // }, [])
 
   const handleOpenDialog = () => {
     setDialogOpen(true)

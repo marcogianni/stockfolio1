@@ -14,7 +14,7 @@ import { Button } from './ui/button'
 
 export default function Header() {
   const { supabase, user } = useSupabase()
-  console.debug('Header', { user, supabase })
+  console.debug('Header', { user })
 
   const isLoggedIn = useMemo(() => ![undefined, null].includes(user?.email), [user])
 

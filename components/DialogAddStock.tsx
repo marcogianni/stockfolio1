@@ -1,12 +1,15 @@
 'use client'
 
-import { useCallback, useEffect, useReducer } from 'react'
+import { useCallback, useEffect, useMemo, useReducer } from 'react'
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 
 import { searchStock } from '@/api/twelvedata'
+import { DataTable } from './table-stocks/DataTable'
+import { columns } from '@/components/table-stocks/columns'
+import { debounce } from '@/lib/utils'
+
 type Props = {
   open: boolean
   onClose: () => void
@@ -46,13 +49,14 @@ const reducer = (state: State, action: Action) => {
 
 export default function DialogAddStock(props: Props) {
   const [state, dispatch] = useReducer(reducer, initialState)
+  console.log('DialogAddStock', state)
 
   const handleLoadStocks = useCallback(async () => {
     dispatch({ type: 'SET_LOADING', payload: true })
-    const data = await searchStock(state.query)
+    const data = await searchStock(state.query) // state.query
     console.log('Dashboard', data)
 
-    dispatch({ type: 'SET_RESULTS', payload: data })
+    dispatch({ type: 'SET_RESULTS', payload: data.data })
     dispatch({ type: 'SET_LOADING', payload: false })
   }, [state.query])
 
@@ -62,16 +66,21 @@ export default function DialogAddStock(props: Props) {
     }
   }, [state.query])
 
+  const changeQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch({ type: 'SET_QUERY', payload: e.target.value })
+  }
+
+  const handleChangeQuery = useMemo(() => debounce(changeQuery, 500), [])
+
   return (
     <Dialog open={props.open}>
       <DialogContent className="sm:max-w-[700px]">
         <DialogHeader>Add Stock</DialogHeader>
         <div>
-          <Input placeholder="Search by Symbol" id="query" className="col-span-3" />
+          <Input onChange={handleChangeQuery} placeholder="Search by Symbol" id="query" className="col-span-3" />
+          <DataTable columns={columns} data={state.results} />
           <Input placeholder="Insert quantity" id="quantity" className="col-span-3 mt-3" />
           <Input placeholder="Insert purchase price" id="price" className="col-span-3 mt-3" />
-
-          <div>Table</div>
         </div>
 
         <DialogFooter>
