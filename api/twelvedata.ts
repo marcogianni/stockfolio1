@@ -21,3 +21,31 @@ export const searchStock = async (symbol: string) => {
     console.error(error)
   }
 }
+
+export const timeSeries = async (
+  symbol: string,
+  interval: '1h' | '4h' | '1day' | '1week' | '1month'
+  // startDate: string,
+  // endDate: string
+) => {
+  const options = {
+    method: 'GET',
+    url: `https://api.twelvedata.com/time_series`,
+    params: {
+      symbol: symbol,
+      interval: interval,
+      apikey: process.env.NEXT_TWELVEDATA,
+      outputsize: 500, // Supports values in the range from 1 to 5000 (default 30)
+      // start_date: startDate,
+      // end_date: endDate,
+    },
+    headers,
+  }
+
+  try {
+    const response = await axios.request(options)
+    return response.data
+  } catch (error) {
+    console.error(error)
+  }
+}

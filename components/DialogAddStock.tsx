@@ -58,7 +58,7 @@ export default function DialogAddStock(props: Props) {
     const value = e.target.value
     if (value.length > 0) {
       const data = await searchStock(value) // state.query
-      console.log('Dashboard', data)
+      console.log('searchStock', data.data)
       dispatch({ type: 'SET_RESULTS', payload: data.data })
     }
 
@@ -80,7 +80,7 @@ export default function DialogAddStock(props: Props) {
           <Input type="number" placeholder="Insert quantity" id="quantity" className="col-span-3 mt-3" />
           <div className="flex items-center space-x-2 mt-3">
             <Input type="number" placeholder="Insert purchase price" id="price" className="col-span-3 flex-1" />
-            <Select defaultValue="USD">
+            <Select value={state.currency}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select currency" />
               </SelectTrigger>
