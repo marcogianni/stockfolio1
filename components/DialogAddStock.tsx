@@ -4,13 +4,13 @@ import { useCallback, useEffect, useMemo, useReducer } from 'react'
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { DataTable } from '@/components/table-stocks/DataTable'
+import { columns } from '@/components/table-stocks/columns'
+import { Separator } from '@/components/ui/separator'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 import { searchStock } from '@/api/twelvedata'
-import { DataTable, MemoDataTable } from './table-stocks/DataTable'
-import { columns } from '@/components/table-stocks/columns'
 import { debounce } from '@/lib/utils'
-import { Separator } from '@/components/ui/separator'
-
 type Props = {
   open: boolean
   onClose: () => void
@@ -74,7 +74,22 @@ export default function DialogAddStock(props: Props) {
           <DataTable columns={columns} data={state.results} />
           <Separator />
           <Input type="number" placeholder="Insert quantity" id="quantity" className="col-span-3 mt-3" />
-          <Input type="number" placeholder="Insert purchase price" id="price" className="col-span-3 mt-3" />
+          <div className="flex items-center space-x-2 mt-3">
+            <Input type="number" placeholder="Insert purchase price" id="price" className="col-span-3 flex-1" />
+            <Select defaultValue="USD">
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select currency" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Currency</SelectLabel>
+                  <SelectItem value="USD">USD</SelectItem>
+                  <SelectItem value="EUR">EUR</SelectItem>
+                  <SelectItem value="CAD">CAD</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <DialogFooter>
