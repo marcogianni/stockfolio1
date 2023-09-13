@@ -16,7 +16,6 @@ export const searchStock = async (symbol: string) => {
 
   try {
     const response = await axios.request(options)
-    console.log('searchStock', response.data)
   } catch (error) {
     console.error(error)
   }

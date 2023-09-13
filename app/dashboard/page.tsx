@@ -1,22 +1,28 @@
 'use client'
 
-import { searchStock } from '@/api/twelvedata'
+import DialogAddStock from '@/components/DialogAddStock'
 import Empty from '@/components/Empty'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function Dashboard() {
-  useEffect(() => {
-    const loadData = async () => {
-      const data = await searchStock('AA')
-      console.log('Dashboard', data)
-    }
-    loadData()
-  }, [])
+  const [dialogOpen, setDialogOpen] = useState(false)
+  // useEffect(() => {
+  //   const loadData = async () => {
+  //     const data = await searchStock('AA')
+  //     console.log('Dashboard', data)
+  //   }
+  //   loadData()
+  // }, [])
+
+  const handleOpenDialog = () => {
+    setDialogOpen(true)
+  }
 
   return (
     <div className="flex-1">
       <div className="container relative">
-        <Empty />
+        <Empty handleOpenDialog={handleOpenDialog} />
+        <DialogAddStock open={dialogOpen} onClose={() => setDialogOpen(false)} />
       </div>
     </div>
   )
