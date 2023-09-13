@@ -3,20 +3,33 @@
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable, getPaginationRowModel } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { memo } from 'react'
+import { memo, useEffect, useMemo } from 'react'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  dispatch: any // TODO
 }
 
-export function DataTable<TData, TValue>({ data, columns }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ data, columns, dispatch }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   })
+
+  const selected = table.getRowModel().rows.filter((row) => row.getIsSelected())[0]?.['original'] ?? null
+
+  console.debug('Rendering DataTable')
+
+  useEffect(() => {
+    if (selected != null) {
+      dispatch({ type: 'SET_SELECTED', payload: selected })
+    } else {
+      dispatch({ type: 'SET_SELECTED', payload: null })
+    }
+  }, [selected])
 
   return (
     <div>

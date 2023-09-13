@@ -12,13 +12,15 @@ export default function Dashboard() {
     setDialogOpen(true)
   }
 
-  useEffect(() => {
-    const series = async () => {
-      const data = await timeSeries('AAPL', '1month')
-      console.log('Series', data)
-    }
-    series()
-  })
+  // useEffect(() => {
+  //   const series = async () => {
+  //     const data = await timeSeries('AAPL', '1month')
+  //     console.log('Series', data)
+  //   }
+  //   series()
+  // })
+
+  // MOVE STATE TO THE CHILDREN
 
   return (
     <div className="flex-1">

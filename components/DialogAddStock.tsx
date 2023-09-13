@@ -21,6 +21,7 @@ const initialState = {
   results: [],
   loading: false,
   selected: null,
+  quantity: null,
   currency: 'USD',
   error: null,
 }
@@ -54,20 +55,23 @@ const reducer = (state: State, action: Action) => {
 export default function DialogAddStock(props: Props) {
   const [state, dispatch] = useReducer(reducer, initialState)
 
+  console.debug('Rendering DialogAddStock', state)
+
   const changeQuery = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     if (value.length > 0) {
       const data = await searchStock(value) // state.query
       console.log('searchStock', data.data)
       dispatch({ type: 'SET_RESULTS', payload: data.data })
+      dispatch({ type: 'SET_QUERY', payload: value })
     }
-
-    dispatch({ type: 'SET_QUERY', payload: value })
   }
 
   const handleChangeQuery = useMemo(() => debounce(changeQuery, 500), [])
 
-  console.debug('DialogAddStock rendering!')
+  const handleSubmit = () => {
+    console.log('handleSubmit')
+  }
 
   return (
     <Dialog open={props.open}>
@@ -75,12 +79,12 @@ export default function DialogAddStock(props: Props) {
         <DialogHeader>Add Stock</DialogHeader>
         <div>
           <Input onChange={handleChangeQuery} placeholder="Search by symbol and toggle it" id="query" className="col-span-3" />
-          <DataTable columns={columns} data={state.results} />
+          <DataTable columns={columns} data={state.results} dispatch={dispatch} />
           <Separator />
-          <Input type="number" placeholder="Insert quantity" id="quantity" className="col-span-3 mt-3" />
+          <Input min={1} type="number" placeholder="Insert quantity" id="quantity" className="col-span-3 mt-3" />
           <div className="flex items-center space-x-2 mt-3">
             <Input type="number" placeholder="Insert purchase price" id="price" className="col-span-3 flex-1" />
-            <Select value={state.currency}>
+            <Select value={state.currency} disabled>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select currency" />
               </SelectTrigger>
@@ -100,7 +104,7 @@ export default function DialogAddStock(props: Props) {
           <Button variant="outline" onClick={props.onClose}>
             Cancel
           </Button>
-          <Button>Add Stock</Button>
+          <Button onClick={handleSubmit}>Add Stock</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
