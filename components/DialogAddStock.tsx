@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useReducer } from 'react'
+import { useMemo, useReducer } from 'react'
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,13 +21,14 @@ const initialState = {
   results: [],
   loading: false,
   selected: null,
+  currency: 'USD',
   error: null,
 }
 
 type State = typeof initialState
 
 type Action = {
-  type: 'SET_QUERY' | 'SET_RESULTS' | 'SET_LOADING' | 'SET_SELECTED' | 'SET_ERROR'
+  type: 'SET_QUERY' | 'SET_RESULTS' | 'SET_LOADING' | 'SET_SELECTED' | 'SET_CURRENCY' | 'SET_ERROR'
   payload: any
 }
 
@@ -41,6 +42,8 @@ const reducer = (state: State, action: Action) => {
       return { ...state, loading: action.payload }
     case 'SET_SELECTED':
       return { ...state, selected: action.payload }
+    case 'SET_CURRENCY':
+      return { ...state, currency: action.payload }
     case 'SET_ERROR':
       return { ...state, error: action.payload }
     default:
@@ -50,7 +53,6 @@ const reducer = (state: State, action: Action) => {
 
 export default function DialogAddStock(props: Props) {
   const [state, dispatch] = useReducer(reducer, initialState)
-  console.debug('DialogAddStock rendering!')
 
   const changeQuery = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -64,6 +66,8 @@ export default function DialogAddStock(props: Props) {
   }
 
   const handleChangeQuery = useMemo(() => debounce(changeQuery, 500), [])
+
+  console.debug('DialogAddStock rendering!')
 
   return (
     <Dialog open={props.open}>
