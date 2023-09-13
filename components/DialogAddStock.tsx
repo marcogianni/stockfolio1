@@ -68,14 +68,10 @@ export default function DialogAddStock(props: Props) {
         <DialogHeader>Add Stock</DialogHeader>
         <div>
           <Input placeholder="Search by Symbol" id="query" className="col-span-3" />
-          <div>
-            <Accordion type="single" collapsible className="w-full mt-5">
-              <AccordionItem value="item-1">
-                <AccordionTrigger>Results</AccordionTrigger>
-                <AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </div>
+          <Input placeholder="Insert quantity" id="quantity" className="col-span-3 mt-3" />
+          <Input placeholder="Insert purchase price" id="price" className="col-span-3 mt-3" />
+
+          <div>Table</div>
         </div>
 
         <DialogFooter>
