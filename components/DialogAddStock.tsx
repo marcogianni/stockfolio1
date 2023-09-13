@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
 import { searchStock } from '@/api/twelvedata'
-import { DataTable } from './table-stocks/DataTable'
+import { DataTable, MemoDataTable } from './table-stocks/DataTable'
 import { columns } from '@/components/table-stocks/columns'
 import { debounce } from '@/lib/utils'
+import { Separator } from '@/components/ui/separator'
 
 type Props = {
   open: boolean
@@ -49,25 +50,17 @@ const reducer = (state: State, action: Action) => {
 
 export default function DialogAddStock(props: Props) {
   const [state, dispatch] = useReducer(reducer, initialState)
-  console.log('DialogAddStock', state)
+  console.debug('DialogAddStock rendering!')
 
-  const handleLoadStocks = useCallback(async () => {
-    dispatch({ type: 'SET_LOADING', payload: true })
-    const data = await searchStock(state.query) // state.query
-    console.log('Dashboard', data)
-
-    dispatch({ type: 'SET_RESULTS', payload: data.data })
-    dispatch({ type: 'SET_LOADING', payload: false })
-  }, [state.query])
-
-  useEffect(() => {
-    if (state.query.length > 0) {
-      handleLoadStocks()
+  const changeQuery = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    if (value.length > 0) {
+      const data = await searchStock(value) // state.query
+      console.log('Dashboard', data)
+      dispatch({ type: 'SET_RESULTS', payload: data.data })
     }
-  }, [state.query])
 
-  const changeQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch({ type: 'SET_QUERY', payload: e.target.value })
+    dispatch({ type: 'SET_QUERY', payload: value })
   }
 
   const handleChangeQuery = useMemo(() => debounce(changeQuery, 500), [])
@@ -79,8 +72,9 @@ export default function DialogAddStock(props: Props) {
         <div>
           <Input onChange={handleChangeQuery} placeholder="Search by Symbol" id="query" className="col-span-3" />
           <DataTable columns={columns} data={state.results} />
-          <Input placeholder="Insert quantity" id="quantity" className="col-span-3 mt-3" />
-          <Input placeholder="Insert purchase price" id="price" className="col-span-3 mt-3" />
+          <Separator />
+          <Input type="number" placeholder="Insert quantity" id="quantity" className="col-span-3 mt-3" />
+          <Input type="number" placeholder="Insert purchase price" id="price" className="col-span-3 mt-3" />
         </div>
 
         <DialogFooter>

@@ -3,6 +3,7 @@
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable, getPaginationRowModel } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { memo } from 'react'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -64,3 +65,5 @@ export function DataTable<TData, TValue>({ data, columns }: DataTableProps<TData
     </div>
   )
 }
+
+export const MemoDataTable = memo(DataTable)
