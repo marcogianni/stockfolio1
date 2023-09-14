@@ -1,9 +1,8 @@
-'use client'
+import { useMemo } from 'react'
+import { Line } from 'react-chartjs-2'
 
 import { useUserStocks } from '@/contexts/UserStocksContext'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Tooltip } from 'chart.js'
-import { useMemo } from 'react'
-import { Line } from 'react-chartjs-2'
 
 type Props = {}
 
@@ -95,7 +94,7 @@ export default function PortfolioChart(props: Props) {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-10">
       <Line options={options} data={config} />
       {/* <Line options={options} data={purchasePriceConfig} /> */}
     </div>

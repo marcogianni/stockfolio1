@@ -32,3 +32,10 @@ export type UserSession = {
   userSession: Session | null
   user: User | null
 }
+
+export type Stock = {
+  symbol: string
+  currency: string
+  exchange: string
+  instrumentName: string
+}

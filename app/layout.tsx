@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import Header from '@/components/Header'
 import { Toaster } from '@/components/ui/toaster'
+import SplashScreenWrapper from '@/components/splash/SplashScreenWrapper'
 import { SupabaseProvider } from '@/contexts/SupabaseContext'
 import { UserStocksProvider } from '@/contexts/UserStocksContext'
 
@@ -19,15 +20,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <SupabaseProvider>
-            <UserStocksProvider>
-              <Header />
-              {children}
-            </UserStocksProvider>
-          </SupabaseProvider>
-          <Toaster />
-        </ThemeProvider>
+        <SplashScreenWrapper>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+            <SupabaseProvider>
+              <UserStocksProvider>
+                <Header />
+                {children}
+              </UserStocksProvider>
+            </SupabaseProvider>
+            <Toaster />
+          </ThemeProvider>
+        </SplashScreenWrapper>
       </body>
     </html>
   )
