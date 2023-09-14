@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 
 import { searchStock } from '@/api/twelvedata'
 import { debounce } from '@/lib/utils'
+
 type Props = {
   open: boolean
   onClose: () => void
@@ -21,7 +22,7 @@ const initialState = {
   results: [],
   loading: false,
   selected: null,
-  quantity: null,
+  quantity: 0,
   currency: 'USD',
   error: null,
 }
@@ -29,7 +30,7 @@ const initialState = {
 type State = typeof initialState
 
 type Action = {
-  type: 'SET_QUERY' | 'SET_RESULTS' | 'SET_LOADING' | 'SET_SELECTED' | 'SET_CURRENCY' | 'SET_ERROR'
+  type: 'SET_QUERY' | 'SET_RESULTS' | 'SET_LOADING' | 'SET_SELECTED' | 'SET_CURRENCY' | 'SET_PRICE' | 'SET_QUANTITY' | 'SET_ERROR'
   payload: any
 }
 
@@ -39,12 +40,15 @@ const reducer = (state: State, action: Action) => {
       return { ...state, query: action.payload }
     case 'SET_RESULTS':
       return { ...state, results: action.payload }
-    case 'SET_LOADING':
-      return { ...state, loading: action.payload }
     case 'SET_SELECTED':
       return { ...state, selected: action.payload }
     case 'SET_CURRENCY':
       return { ...state, currency: action.payload }
+    case 'SET_PRICE':
+      return { ...state, price: Number(action.payload) }
+    case 'SET_QUANTITY': {
+      return { ...state, quantity: Number(action.payload) }
+    }
     case 'SET_ERROR':
       return { ...state, error: action.payload }
     default:
@@ -68,6 +72,8 @@ export default function DialogAddStock(props: Props) {
   }
 
   const handleChangeQuery = useMemo(() => debounce(changeQuery, 500), [])
+  const handleChangeQuantity = useMemo(() => debounce((e) => dispatch({ type: 'SET_QUANTITY', payload: Number(e.target.value) }), 500), [])
+  const handleChangePrice = useMemo(() => debounce((e) => dispatch({ type: 'SET_PRICE', payload: Number(e.target.value) }), 500), [])
 
   const handleSubmit = () => {
     console.log('handleSubmit')
@@ -78,13 +84,26 @@ export default function DialogAddStock(props: Props) {
       <DialogContent className="sm:max-w-[700px]">
         <DialogHeader>Add Stock</DialogHeader>
         <div>
-          <Input onChange={handleChangeQuery} placeholder="Search by symbol and toggle it" id="query" className="col-span-3" />
+          <Input required onChange={handleChangeQuery} placeholder="Search by symbol and toggle it" id="query" className="col-span-3" />
           <DataTable columns={columns} data={state.results} dispatch={dispatch} />
           <Separator />
-          <Input min={1} type="number" placeholder="Insert quantity" id="quantity" className="col-span-3 mt-3" />
+          <Input
+            onChange={handleChangeQuantity}
+            min={1}
+            type="number"
+            placeholder="Insert quantity"
+            id="quantity"
+            className="col-span-3 mt-3"
+          />
           <div className="flex items-center space-x-2 mt-3">
-            <Input type="number" placeholder="Insert purchase price" id="price" className="col-span-3 flex-1" />
-            <Select value={state.currency} disabled>
+            <Input
+              onChange={handleChangePrice}
+              type="number"
+              placeholder="Insert purchase price"
+              id="price"
+              className="col-span-3 flex-1"
+            />
+            <Select value={state.currency} disabled onValueChange={(value) => dispatch({ type: 'SET_CURRENCY', payload: value })}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select currency" />
               </SelectTrigger>

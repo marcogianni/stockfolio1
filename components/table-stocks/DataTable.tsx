@@ -24,11 +24,7 @@ export function DataTable<TData, TValue>({ data, columns, dispatch }: DataTableP
   console.debug('Rendering DataTable')
 
   useEffect(() => {
-    if (selected != null) {
-      dispatch({ type: 'SET_SELECTED', payload: selected })
-    } else {
-      dispatch({ type: 'SET_SELECTED', payload: null })
-    }
+    dispatch({ type: 'SET_SELECTED', payload: selected })
   }, [selected])
 
   return (
@@ -68,10 +64,10 @@ export function DataTable<TData, TValue>({ data, columns, dispatch }: DataTableP
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
-        <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+        <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage() || selected != null}>
           Previous
         </Button>
-        <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+        <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage() || selected != null}>
           Next
         </Button>
       </div>
