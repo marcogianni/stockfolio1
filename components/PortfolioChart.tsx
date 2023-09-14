@@ -41,10 +41,9 @@ export default function PortfolioChart(props: Props) {
 
   const getStockQuantity = (symbol: string): number => {
     // given a stock symbol, return the quantity from the stocks array
-    if (stocks.length === 0) return 1
 
     const stock = stocks.find((stock) => stock.symbol === symbol)
-    return stock.quantity
+    return stock?.quantity ?? 1
   }
 
   const values = useMemo(() => {
