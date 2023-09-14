@@ -37,7 +37,7 @@ export const options = {
 export default function PortfolioChart(props: Props) {
   const { series, stocks, data } = useUserStocks()
 
-  console.debug('Rendering PortfolioChart', { series })
+  console.debug('PortfolioChart')
 
   const getStockQuantity = (symbol: string): number => {
     // given a stock symbol, return the quantity from the stocks array

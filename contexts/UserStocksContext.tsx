@@ -51,7 +51,7 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
   const [state, dispatch] = useReducer(reducer, initialState)
   const { supabase, user } = useSupabase()
 
-  console.debug('Rendering UserStocksProvider', { state, user })
+  console.debug('UserStocksProvider')
 
   const totalInvested: number = useMemo(
     () =>

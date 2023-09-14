@@ -1,16 +1,16 @@
 'use client'
 
-// https://www.propelauth.com/post/authentication-with-nextjs-13-and-supabase-app-router
-
+import { useMemo } from 'react'
 import Link from 'next/link'
-import { ThemeSwitcher } from '@/components/ThemeSwitcher'
+
+import ThemeSwitcher from '@/components/ThemeSwitcher'
 import LoginDialog from '@/components/LoginDialog'
+import { Button } from '@/components/ui/button'
+
+import { useSupabase } from '@/contexts/SupabaseContext'
+import { PersonIcon } from '@radix-ui/react-icons'
 
 import type { Database } from '@/lib/database.types'
-import { useSupabase } from '@/contexts/SupabaseContext'
-import { useEffect, useMemo } from 'react'
-import { PersonIcon } from '@radix-ui/react-icons'
-import { Button } from './ui/button'
 
 export default function Header() {
   const { supabase, user } = useSupabase()
