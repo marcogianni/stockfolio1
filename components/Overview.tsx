@@ -68,7 +68,10 @@ export default function Overview(props: Props) {
         <Card>
           <CardHeader>
             <CardTitle>
-              Stocks <Button onClick={props.handleOpenDialog}>Add Stocks</Button>
+              <div className="flex justify-between items-center">
+                <span>Stocks</span>
+                <Button onClick={props.handleOpenDialog}>Add Stocks</Button>
+              </div>
             </CardTitle>
           </CardHeader>
         </Card>

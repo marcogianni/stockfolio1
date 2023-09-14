@@ -30,29 +30,61 @@ export const options = {
 }
 
 export default function PortfolioChart(props: Props) {
-  const { series } = useUserStocks()
+  const { series, stocks, data } = useUserStocks()
 
   console.debug('Rendering PortfolioChart', { series })
 
-  //   const labels = useMemo(() => series?.[0]?.map((serie) => serie.data.datetime), [series])
-  //   const values = useMemo(() => series?.[0]?.map((serie) => serie.close), [series])
+  const getStockQuantity = (symbol: string): number => {
+    // given a stock symbol, return the quantity from the stocks array
+    if (stocks.length === 0) return 1
 
-  //   const final = series?.reduce((acc, serie) => {
-  //     return serie.map((s) => s.close)
-  //   }, [])
+    const stock = stocks.find((stock) => stock.symbol === symbol)
+    return stock.quantity
+  }
 
-  //   const data = {
-  //     labels,
-  //     datasets: [
-  //       {
-  //         label: 'Portfolio Value',
-  //         data: values,
-  //         fill: true,
-  //         backgroundColor: '#22c55e',
-  //         borderColor: '#22c55e',
-  //       },
-  //     ],
-  //   }
+  const values = useMemo(() => {
+    const seriesLength = series?.[0]?.data.length
+    const seriesCount = series?.length
+    // aggregate all the values
+    const values = []
+    for (let i = 0; i < seriesLength; i++) {
+      let value = 0
+      for (let j = 0; j < seriesCount; j++) {
+        value += Number(series?.[j]?.data[i]?.close) * getStockQuantity(series?.[j]?.symbol)
+      }
+      values.push(value)
+    }
 
-  return <div className="p-8">{/* <Line options={options} data={data} /> */}</div>
+    return values
+  }, [series])
+
+  const labels = useMemo(() => {
+    console.log('calculateLabels', series)
+    if (series.length > 0) {
+      return series?.[0]?.data.map((serie) => serie.datetime)
+    }
+
+    return []
+  }, [series])
+
+  const isProfit = useMemo(() => Number(data?.profitLoss) > 0, [data.profitLoss])
+
+  const config = {
+    labels,
+    datasets: [
+      {
+        label: 'Portfolio Value',
+        data: values,
+        fill: true,
+        backgroundColor: isProfit ? '#22c55e' : '#e11d48',
+        borderColor: isProfit ? '#22c55e' : '#e11d48',
+      },
+    ],
+  }
+
+  return (
+    <div className="p-8">
+      <Line options={options} data={config} />
+    </div>
+  )
 }

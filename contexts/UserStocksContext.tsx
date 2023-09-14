@@ -90,7 +90,6 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
       })
 
       const result = await Promise.all(promises)
-
       console.debug('loadStocks', result)
 
       // Merge it with the stock object
@@ -116,14 +115,10 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
       })
 
       let series: Serie[] = await Promise.all(promises)
+      const minLength = Math.min(...series.map((serie) => serie.data.length))
+      // keep series with the same length
+      series = series.map((serie) => ({ ...serie, data: serie.data.slice(0, minLength) }))
       let sortedSeries: Serie[] = series.map((serie: Serie) => ({ symbol: serie.symbol, data: serie.data.reverse() }))
-      console.debug('SERIES', { series, sortedSeries })
-
-      /*
-       const minLength = Math.min(...series.map((serie) => serie.data.length))
-      sortedSeries = sortedSeries.map((serie) => (serie.data = serie.data.slice(0, minLength)))
-      // in this case sortedSeries could have different array size of serie.data, so we need to find the min length and slice the array to that length
-      */
 
       dispatch({ type: 'SET_SERIES', payload: sortedSeries })
     }
