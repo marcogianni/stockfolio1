@@ -117,6 +117,7 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
 
       let series: Serie[] = await Promise.all(promises)
       let sortedSeries: Serie[] = series.map((serie: Serie) => ({ symbol: serie.symbol, data: serie.data.reverse() }))
+      console.debug('SERIES', { series, sortedSeries })
 
       /*
        const minLength = Math.min(...series.map((serie) => serie.data.length))
