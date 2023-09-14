@@ -11,6 +11,11 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip)
 
 export const options = {
   responsive: true,
+  elements: {
+    point: {
+      radius: 0,
+    },
+  },
   scales: {
     x: {
       ticks: {
@@ -79,12 +84,21 @@ export default function PortfolioChart(props: Props) {
         backgroundColor: isProfit ? '#22c55e' : '#e11d48',
         borderColor: isProfit ? '#22c55e' : '#e11d48',
       },
+      {
+        label: 'Purchase Price',
+        data: values.map((single) => Number(data?.totalInvested)),
+        fill: false,
+        backgroundColor: '#787777',
+        borderColor: '#787777',
+        borderDash: [10, 5],
+      },
     ],
   }
 
   return (
     <div className="p-8">
       <Line options={options} data={config} />
+      {/* <Line options={options} data={purchasePriceConfig} /> */}
     </div>
   )
 }
