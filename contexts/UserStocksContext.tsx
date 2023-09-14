@@ -87,13 +87,8 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
   )
 
   const profitLoss = useMemo(
-    () =>
-      state.stocks
-        .reduce((acc: number, stock: UserStock) => {
-          return acc + stock.quantity * stock.current_price - stock.quantity * stock.purchase_price
-        }, 0)
-        .toFixed(2),
-    [state.stocks]
+    () => (Number((portfolioValue - totalInvested) / totalInvested) * 100).toFixed(2),
+    [totalInvested, portfolioValue]
   )
 
   useEffect(() => {
