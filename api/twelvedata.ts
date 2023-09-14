@@ -35,7 +35,7 @@ export const timeSeries = async (
       symbol: symbol,
       interval: interval,
       apikey: process.env.NEXT_TWELVEDATA,
-      outputsize: 500, // Supports values in the range from 1 to 5000 (default 30)
+      outputsize: 200, // Supports values in the range from 1 to 5000 (default 30)
       // start_date: startDate,
       // end_date: endDate,
     },

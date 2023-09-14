@@ -3,21 +3,7 @@
 import { createContext, useEffect, useReducer, useContext, useMemo } from 'react'
 import { useSupabase } from '@/contexts/SupabaseContext'
 import { timeSeries, endOfDatePrice } from '@/api/twelvedata'
-
-interface Serie {
-  open: number
-}
-
-interface UserStock {
-  id: number
-  symbol: string
-  currency: string
-  exchange: string
-  instrument_name: string
-  quantity: number
-  purchase_price: number
-  current_price: number
-}
+import { Serie, UserStock } from '@/lib/types'
 
 type UserStocksContextType = {
   series: Serie[]
@@ -30,17 +16,11 @@ type UserStocksContextType = {
   data: {
     totalInvested: number
     portfolioValue: number
-    profitLoss: number
+    profitLoss: string
   }
 }
 
 export const UserStocksContext = createContext({} as UserStocksContextType)
-
-const initialState = {
-  series: [],
-  stocks: [],
-  interval: '1month',
-}
 
 const reducer = (state: any, action: any) => {
   switch (action.type) {
@@ -60,13 +40,19 @@ const reducer = (state: any, action: any) => {
   }
 }
 
+const initialState = {
+  series: [],
+  stocks: [],
+  interval: '1month',
+}
+
 export const UserStocksProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const { supabase, user } = useSupabase()
 
   console.debug('Rendering UserStocksProvider', { state, user })
 
-  const totalInvested = useMemo(
+  const totalInvested: number = useMemo(
     () =>
       state.stocks
         .reduce((acc: number, stock: UserStock) => {
@@ -76,7 +62,7 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
     [state.stocks]
   )
 
-  const portfolioValue = useMemo(
+  const portfolioValue: number = useMemo(
     () =>
       state.stocks
         .reduce((acc: number, stock: UserStock) => {
@@ -86,7 +72,7 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
     [state.stocks]
   )
 
-  const profitLoss = useMemo(
+  const profitLoss: string = useMemo(
     () => (Number((portfolioValue - totalInvested) / totalInvested) * 100).toFixed(2),
     [totalInvested, portfolioValue]
   )
@@ -98,14 +84,15 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
 
       if (data) {
         const promises = data.map(async (stock: UserStock) => {
-          const response = await endOfDatePrice(stock.symbol)
-          return response
+          return await endOfDatePrice(stock.symbol)
         })
 
-        const prices = await Promise.all(promises)
+        const series = await Promise.all(promises)
+
+        console.debug('loadStocks', { series })
 
         const updatedStocks = data.map((stock: UserStock) => {
-          const price = prices.find((price) => price.symbol === stock.symbol)
+          const price = series.find((price) => price.symbol === stock.symbol)
           return { ...stock, current_price: Number(price?.close) }
         })
 
@@ -123,7 +110,11 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
         return values
       })
       const series = await Promise.all(promises)
-      dispatch({ type: 'SET_SERIES', payload: series })
+
+      const sortedSeries = series.map((serie: Serie[]) => serie.reverse())
+
+      console.debug('AAAAAA', { sortedSeries, series })
+      dispatch({ type: 'SET_SERIES', payload: sortedSeries })
     }
     loadSeries()
   }, [state.stocks, state.interval])

@@ -1,9 +1,17 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useUserStocks } from '@/contexts/UserStocksContext'
-import { TriangleUpIcon } from '@radix-ui/react-icons'
 import { useMemo } from 'react'
 
-export default function Overview() {
+import { TriangleUpIcon } from '@radix-ui/react-icons'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import PortfolioChart from '@/components/PortfolioChart'
+
+import { useUserStocks } from '@/contexts/UserStocksContext'
+import { Button } from './ui/button'
+
+type Props = {
+  handleOpenDialog: () => void
+}
+
+export default function Overview(props: Props) {
   const { data } = useUserStocks()
 
   console.debug('Rendering Overview', { data })
@@ -53,15 +61,15 @@ export default function Overview() {
       </div>
       <div className="grid grid-cols-1 gap-6 mt-6">
         <Card>
-          <CardHeader>
-            <CardTitle>Chart</CardTitle>
-          </CardHeader>
+          <PortfolioChart />
         </Card>
       </div>
       <div className="grid grid-cols-1 gap-6 mt-6">
         <Card>
           <CardHeader>
-            <CardTitle>Stocks</CardTitle>
+            <CardTitle>
+              Stocks <Button onClick={props.handleOpenDialog}>Add Stocks</Button>
+            </CardTitle>
           </CardHeader>
         </Card>
       </div>

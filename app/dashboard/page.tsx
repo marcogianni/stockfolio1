@@ -29,7 +29,7 @@ export default function Dashboard() {
   return (
     <div className="flex-1">
       <div className="container relative">
-        {stocks.length === 0 ? <Empty handleOpenDialog={handleOpenDialog} /> : <Overview />}
+        {stocks.length === 0 ? <Empty handleOpenDialog={handleOpenDialog} /> : <Overview handleOpenDialog={handleOpenDialog} />}
         <DialogAddStock open={dialogOpen} onClose={() => setDialogOpen(false)} />
       </div>
     </div>
