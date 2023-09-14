@@ -13,7 +13,7 @@ export default function Overview() {
             <CardDescription>The current value of your stockfolio</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$ 32</div>
+            <div className="text-2xl font-bold">$ {data.portfolioValue}</div>
           </CardContent>
         </Card>
         <Card>
@@ -22,7 +22,7 @@ export default function Overview() {
             <CardDescription>The amount invested for these stocks</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$ {data.portfolioBalance}</div>
+            <div className="text-2xl font-bold">$ {data.totalInvested}</div>
           </CardContent>
         </Card>
         <Card>
@@ -31,7 +31,7 @@ export default function Overview() {
             <CardDescription>How is going your investment</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+ 12.43%</div>
+            <div className="text-2xl font-bold">+ {data.profitLoss}%</div>
           </CardContent>
         </Card>
       </div>

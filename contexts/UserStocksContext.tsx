@@ -2,8 +2,7 @@
 
 import { createContext, useEffect, useReducer, useContext, useMemo } from 'react'
 import { useSupabase } from '@/contexts/SupabaseContext'
-import { timeSeries } from '@/api/twelvedata'
-import { number } from 'zod'
+import { timeSeries, endOfDatePrice } from '@/api/twelvedata'
 
 interface Serie {
   open: number
@@ -17,6 +16,7 @@ interface UserStock {
   instrument_name: string
   quantity: number
   purchase_price: number
+  current_price: number
 }
 
 type UserStocksContextType = {
@@ -28,7 +28,9 @@ type UserStocksContextType = {
     addStock: (payload: UserStock) => void
   }
   data: {
-    portfolioBalance: number
+    totalInvested: number
+    portfolioValue: number
+    profitLoss: number
   }
 }
 
@@ -64,11 +66,33 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
 
   console.debug('Rendering UserStocksProvider', { state, user })
 
-  const portfolioBalance = useMemo(
+  const totalInvested = useMemo(
     () =>
-      state.stocks.reduce((acc: number, stock: UserStock) => {
-        return acc + stock.quantity * stock.purchase_price
-      }, 0),
+      state.stocks
+        .reduce((acc: number, stock: UserStock) => {
+          return acc + stock.quantity * stock.purchase_price
+        }, 0)
+        .toFixed(2),
+    [state.stocks]
+  )
+
+  const portfolioValue = useMemo(
+    () =>
+      state.stocks
+        .reduce((acc: number, stock: UserStock) => {
+          return acc + stock.quantity * stock.current_price
+        }, 0)
+        .toFixed(2),
+    [state.stocks]
+  )
+
+  const profitLoss = useMemo(
+    () =>
+      state.stocks
+        .reduce((acc: number, stock: UserStock) => {
+          return acc + stock.quantity * stock.current_price - stock.quantity * stock.purchase_price
+        }, 0)
+        .toFixed(2),
     [state.stocks]
   )
 
@@ -76,8 +100,22 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
     const loadStocks = async () => {
       if (!user) return
       const { data } = await supabase.from('user_stocks').select('*').eq('user_id', user?.id)
-      console.debug('loadStocks', data)
-      dispatch({ type: 'SET_STOCKS', payload: data })
+
+      if (data) {
+        const promises = data.map(async (stock: UserStock) => {
+          const response = await endOfDatePrice(stock.symbol)
+          return response
+        })
+
+        const prices = await Promise.all(promises)
+
+        const updatedStocks = data.map((stock: UserStock) => {
+          const price = prices.find((price) => price.symbol === stock.symbol)
+          return { ...stock, current_price: Number(price?.close) }
+        })
+
+        dispatch({ type: 'SET_STOCKS', payload: updatedStocks })
+      }
     }
 
     loadStocks()
@@ -102,7 +140,9 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
   }
 
   const data = {
-    portfolioBalance,
+    totalInvested,
+    portfolioValue,
+    profitLoss,
   }
 
   return (

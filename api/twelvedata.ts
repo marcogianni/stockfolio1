@@ -49,3 +49,22 @@ export const timeSeries = async (
     console.error(error)
   }
 }
+
+export const endOfDatePrice = async (symbol: string) => {
+  const options = {
+    method: 'GET',
+    url: `https://api.twelvedata.com/eod`,
+    params: {
+      symbol: symbol,
+      apikey: process.env.NEXT_TWELVEDATA,
+    },
+    headers,
+  }
+
+  try {
+    const response = await axios.request(options)
+    return response.data
+  } catch (error) {
+    console.error(error)
+  }
+}
