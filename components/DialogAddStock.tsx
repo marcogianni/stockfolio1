@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 
 import { searchStock } from '@/api/twelvedata'
 import { debounce } from '@/lib/utils'
+import { useSupabase } from '@/contexts/SupabaseContext'
+import { toast } from '@/components/ui/use-toast'
 
 type Props = {
   open: boolean
@@ -23,6 +25,7 @@ const initialState = {
   loading: false,
   selected: null,
   quantity: 0,
+  price: 0,
   currency: 'USD',
   error: null,
 }
@@ -46,6 +49,9 @@ const reducer = (state: State, action: Action) => {
       return { ...state, currency: action.payload }
     case 'SET_PRICE':
       return { ...state, price: Number(action.payload) }
+    case 'SET_LOADING': {
+      return { ...state, loading: action.payload }
+    }
     case 'SET_QUANTITY': {
       return { ...state, quantity: Number(action.payload) }
     }
@@ -58,8 +64,9 @@ const reducer = (state: State, action: Action) => {
 
 export default function DialogAddStock(props: Props) {
   const [state, dispatch] = useReducer(reducer, initialState)
+  const { supabase, user } = useSupabase()
 
-  console.debug('Rendering DialogAddStock', state)
+  console.debug('Rendering DialogAddStock', { state, user })
 
   const changeQuery = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -75,8 +82,35 @@ export default function DialogAddStock(props: Props) {
   const handleChangeQuantity = useMemo(() => debounce((e) => dispatch({ type: 'SET_QUANTITY', payload: Number(e.target.value) }), 500), [])
   const handleChangePrice = useMemo(() => debounce((e) => dispatch({ type: 'SET_PRICE', payload: Number(e.target.value) }), 500), [])
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log('handleSubmit')
+
+    dispatch({ type: 'SET_LOADING', payload: true })
+
+    console.log('handleSubmit', state)
+
+    const { data, error } = await supabase
+      .from('user_stocks')
+      .insert({
+        user_id: user?.id,
+        symbol: state.selected?.symbol,
+        instrument_name: state.selected?.instrument_name,
+        mic_code: state.selected?.mic_code,
+        exchange: state.selected?.exchange,
+        quantity: state.quantity,
+        purchase_price: state.price,
+        currency: state.currency,
+      })
+      .select()
+
+    if (error) {
+      toast({ title: 'Error', description: error.message })
+    }
+
+    dispatch({ type: 'SET_LOADING', payload: false })
+
+    props.onClose()
+    console.log('handleSubmit', { data, error })
   }
 
   return (
@@ -123,7 +157,9 @@ export default function DialogAddStock(props: Props) {
           <Button variant="outline" onClick={props.onClose}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>Add Stock</Button>
+          <Button onClick={handleSubmit} loading={state.loading}>
+            Add Stock
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
