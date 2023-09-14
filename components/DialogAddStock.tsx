@@ -13,6 +13,7 @@ import { searchStock } from '@/api/twelvedata'
 import { debounce } from '@/lib/utils'
 import { useSupabase } from '@/contexts/SupabaseContext'
 import { toast } from '@/components/ui/use-toast'
+import { useUserStocks } from '@/contexts/UserStocksContext'
 
 type Props = {
   open: boolean
@@ -63,6 +64,8 @@ const reducer = (state: State, action: Action) => {
 }
 
 export default function DialogAddStock(props: Props) {
+  const { actions } = useUserStocks()
+  const { loadStocks } = actions
   const [state, dispatch] = useReducer(reducer, initialState)
   const { supabase, user } = useSupabase()
 
@@ -87,8 +90,6 @@ export default function DialogAddStock(props: Props) {
 
     dispatch({ type: 'SET_LOADING', payload: true })
 
-    console.log('handleSubmit', state)
-
     const { data, error } = await supabase
       .from('user_stocks')
       .insert({
@@ -108,6 +109,7 @@ export default function DialogAddStock(props: Props) {
     } else {
       toast({ title: 'Success', description: 'Stock added successfully' })
     }
+    await loadStocks()
     console.log('handleSubmit', { data, error })
 
     dispatch({ type: 'SET_LOADING', payload: false })

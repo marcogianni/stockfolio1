@@ -12,6 +12,7 @@ type UserStocksContextType = {
     setSeries: (payload: Serie[]) => void
     setStocks: (payload: UserStock[]) => void
     addStock: (payload: UserStock) => void
+    loadStocks: () => void
   }
   data: {
     totalInvested: number
@@ -77,43 +78,52 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
     [totalInvested, portfolioValue]
   )
 
-  useEffect(() => {
-    const loadStocks = async () => {
-      if (!user) return
-      const { data } = await supabase.from('user_stocks').select('*').eq('user_id', user?.id)
+  const loadStocks = async () => {
+    if (!user) return
+    // Get all stocks for the current user
+    const { data } = await supabase.from('user_stocks').select('*').eq('user_id', user?.id)
 
-      if (data) {
-        const promises = data.map(async (stock: UserStock) => {
-          return await endOfDatePrice(stock.symbol)
-        })
+    if (data) {
+      // Get the current price for each stock
+      const promises = data.map(async (stock: UserStock) => {
+        return await endOfDatePrice(stock.symbol)
+      })
 
-        const series = await Promise.all(promises)
+      const result = await Promise.all(promises)
 
-        console.debug('loadStocks', { series })
+      console.debug('loadStocks', result)
 
-        const updatedStocks = data.map((stock: UserStock) => {
-          const price = series.find((price) => price.symbol === stock.symbol)
-          return { ...stock, current_price: Number(price?.close) }
-        })
+      // Merge it with the stock object
+      const updatedStocks = data.map((stock: UserStock) => {
+        const price = result.find((price) => price.symbol === stock.symbol)
+        return { ...stock, current_price: Number(price?.close) }
+      })
 
-        dispatch({ type: 'SET_STOCKS', payload: updatedStocks })
-      }
+      dispatch({ type: 'SET_STOCKS', payload: updatedStocks })
     }
+  }
 
+  useEffect(() => {
     loadStocks()
   }, [user?.id])
 
   useEffect(() => {
     const loadSeries = async () => {
+      // Get the series for each stock
       const promises = state.stocks.map(async (stock: UserStock) => {
         const { values } = await timeSeries(stock.symbol, state.interval)
-        return values
+        return { symbol: stock.symbol, data: values }
       })
-      const series = await Promise.all(promises)
 
-      const sortedSeries = series.map((serie: Serie[]) => serie.reverse())
+      let series: Serie[] = await Promise.all(promises)
+      let sortedSeries: Serie[] = series.map((serie: Serie) => ({ symbol: serie.symbol, data: serie.data.reverse() }))
 
-      console.debug('AAAAAA', { sortedSeries, series })
+      /*
+       const minLength = Math.min(...series.map((serie) => serie.data.length))
+      sortedSeries = sortedSeries.map((serie) => (serie.data = serie.data.slice(0, minLength)))
+      // in this case sortedSeries could have different array size of serie.data, so we need to find the min length and slice the array to that length
+      */
+
       dispatch({ type: 'SET_SERIES', payload: sortedSeries })
     }
     loadSeries()
@@ -123,6 +133,7 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
     setSeries: (payload: Serie[]) => dispatch({ type: 'SET_SERIES', payload }),
     setStocks: (payload: UserStock[]) => dispatch({ type: 'SET_STOCKS', payload }),
     addStock: (payload: UserStock) => dispatch({ type: 'ADD_STOCK', payload }),
+    loadStocks,
   }
 
   const data = {

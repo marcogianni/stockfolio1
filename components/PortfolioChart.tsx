@@ -32,38 +32,27 @@ export const options = {
 export default function PortfolioChart(props: Props) {
   const { series } = useUserStocks()
 
-  const labels = useMemo(() => series?.[0]?.map((serie) => serie.datetime), [series])
-  const values = useMemo(() => series?.[0]?.map((serie) => serie.close), [series])
+  console.debug('Rendering PortfolioChart', { series })
 
-  // sum the single serie.close of all the series
-  const values2 = useMemo(() => series?.reduce((acc, serie) => acc + serie.close, 0), [series])
+  //   const labels = useMemo(() => series?.[0]?.map((serie) => serie.data.datetime), [series])
+  //   const values = useMemo(() => series?.[0]?.map((serie) => serie.close), [series])
 
-  /*
-  Devo creare un array di values che sia la somma di tutti i valori di tutti i titoli
-  */
+  //   const final = series?.reduce((acc, serie) => {
+  //     return serie.map((s) => s.close)
+  //   }, [])
 
-  const final = series?.reduce((acc, serie) => {
-    return serie.map((s) => s.close)
-  }, [])
+  //   const data = {
+  //     labels,
+  //     datasets: [
+  //       {
+  //         label: 'Portfolio Value',
+  //         data: values,
+  //         fill: true,
+  //         backgroundColor: '#22c55e',
+  //         borderColor: '#22c55e',
+  //       },
+  //     ],
+  //   }
 
-  console.debug('Rendering PortfolioChart', { series, labels, values, values2, final })
-
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: 'Portfolio Value',
-        data: values,
-        fill: true,
-        backgroundColor: '#22c55e',
-        borderColor: '#22c55e',
-      },
-    ],
-  }
-
-  return (
-    <div className="p-8">
-      <Line options={options} data={data} />
-    </div>
-  )
+  return <div className="p-8">{/* <Line options={options} data={data} /> */}</div>
 }

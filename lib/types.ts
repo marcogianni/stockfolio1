@@ -1,5 +1,9 @@
 export interface Serie {
   symbol: string
+  data: TimeSeries[]
+}
+
+export interface TimeSeries {
   open: number
   close: number
   high: number
