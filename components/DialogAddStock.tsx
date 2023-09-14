@@ -105,12 +105,14 @@ export default function DialogAddStock(props: Props) {
 
     if (error) {
       toast({ title: 'Error', description: error.message })
+    } else {
+      toast({ title: 'Success', description: 'Stock added successfully' })
     }
+    console.log('handleSubmit', { data, error })
 
     dispatch({ type: 'SET_LOADING', payload: false })
 
     props.onClose()
-    console.log('handleSubmit', { data, error })
   }
 
   return (

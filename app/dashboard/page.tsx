@@ -3,10 +3,14 @@
 import { timeSeries } from '@/api/twelvedata'
 import DialogAddStock from '@/components/DialogAddStock'
 import Empty from '@/components/Empty'
+import Overview from '@/components/Overview'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useUserStocks } from '@/contexts/UserStocksContext'
 import { useEffect, useState } from 'react'
 
 export default function Dashboard() {
   const [dialogOpen, setDialogOpen] = useState(false)
+  const { stocks, actions } = useUserStocks()
 
   const handleOpenDialog = () => {
     setDialogOpen(true)
@@ -25,7 +29,7 @@ export default function Dashboard() {
   return (
     <div className="flex-1">
       <div className="container relative">
-        <Empty handleOpenDialog={handleOpenDialog} />
+        {stocks.length === 0 ? <Empty handleOpenDialog={handleOpenDialog} /> : <Overview />}
         <DialogAddStock open={dialogOpen} onClose={() => setDialogOpen(false)} />
       </div>
     </div>
