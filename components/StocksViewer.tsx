@@ -17,25 +17,25 @@ export default function StockViewer() {
     (stock: UserStock): React.ReactNode => (
       <Card className="mt-4" key={stock.id}>
         <CardContent>
-          <div className="flex grid-cols-6 gap-6 mt-4 items-center">
-            <div className="flex-1">
+          <div className="flex grid-cols-6 gap-6 mt-4 items-center flex-wrap md:flex-nowrap">
+            <div className="md:flex-1">
               <div className="text-sm">Stock</div>
               <div className="text-lg font-bold">{stock.symbol}</div>
             </div>
-            <div className="flex-1">
+            <div className="md:flex-1">
               <div className="text-sm">Quantity</div>
               <div className="text-lg font-bold">{stock.quantity}</div>
             </div>
-            <div className="flex-1">
+            <div className="md:flex-1">
               <div className="text-sm">Exchange</div>
               <div className="text-lg font-bold">{stock.exchange}</div>
             </div>
 
-            <div className="flex-1">
+            <div className="md:flex-1">
               <div className="text-sm">Purchase Price</div>
               <div className="text-lg font-bold">$ {stock.purchase_price}</div>
             </div>
-            <div className="flex-1">
+            <div className="md:flex-1">
               <div className="text-sm">Current Price</div>
               <div className="text-lg font-bold">$ {stock.current_price}</div>
             </div>
