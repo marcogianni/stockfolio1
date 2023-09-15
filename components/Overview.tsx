@@ -57,10 +57,10 @@ export default function Overview(props: Props) {
         </OverviewCard>
       </div>
       <div className="grid grid-cols-12 gap-6 mt-6">
-        <Card className="col-span-9 inline-block relative">
+        <Card className="col-span-12 md:col-span-9">
           <PortfolioLineChart />
         </Card>
-        <Card className="col-span-3">
+        <Card className="col-span-12 md:col-span-3">
           <PortfolioDoughnutChart />
         </Card>
       </div>
@@ -73,7 +73,7 @@ export default function Overview(props: Props) {
                 <Button onClick={props.handleOpenDialog}>Add Stocks</Button>
               </div>
             </CardTitle>
-            <CardContent>
+            <CardContent className="p-0">
               <StockViewer />
             </CardContent>
           </CardHeader>

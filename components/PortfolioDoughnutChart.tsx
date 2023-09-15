@@ -33,7 +33,7 @@ export default function PortfolioDoughnutChart() {
   }
 
   return (
-    <div className="p-10 h-[400px]">
+    <div className="p-10 h-[200px] md:h-[400px]">
       <Doughnut data={config} options={options} />
     </div>
   )

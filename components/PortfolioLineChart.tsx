@@ -92,7 +92,7 @@ export default function PortfolioLineChart() {
   }
 
   return (
-    <div className="p-5 h-[400px]">
+    <div className="p-5 h-[300px] md:h-[400px]">
       <Line options={options} data={config} />
       {/* <Line options={options} data={purchasePriceConfig} /> */}
     </div>
