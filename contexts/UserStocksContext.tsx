@@ -3,7 +3,7 @@
 import { createContext, useEffect, useReducer, useContext, useMemo } from 'react'
 import { useSupabase } from '@/contexts/SupabaseContext'
 import { timeSeries, endOfDatePrice } from '@/api/twelvedata'
-import { Serie, UserStock } from '@/lib/types'
+import { Serie, Stock, UserStock } from '@/lib/types'
 
 type UserStocksContextType = {
   series: Serie[]
@@ -98,32 +98,33 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
         return { ...stock, current_price: Number(price?.close) }
       })
 
+      const series = await loadSeries(updatedStocks)
+
       dispatch({ type: 'SET_STOCKS', payload: updatedStocks })
+      dispatch({ type: 'SET_SERIES', payload: series })
     }
+  }
+
+  const loadSeries = async (stocks: UserStock[]) => {
+    console.debug('loadSeries', stocks)
+    // Get the series for each stock
+    const promises = stocks.map(async (stock: UserStock) => {
+      const { values } = await timeSeries(stock.symbol, state.interval)
+      return { symbol: stock.symbol, data: values ?? null }
+    })
+
+    let series: Serie[] = await Promise.all(promises)
+    console.debug('loadSeries', series)
+    const minLength = Math.min(...series.map((serie) => serie?.data?.length))
+    // keep series with the same length
+    series = series.map((serie) => ({ ...serie, data: serie?.data?.slice(0, minLength) }))
+    let sortedSeries: Serie[] = series.map((serie: Serie) => ({ symbol: serie.symbol, data: serie.data.reverse() }))
+    return sortedSeries
   }
 
   useEffect(() => {
     loadStocks()
   }, [user?.id])
-
-  useEffect(() => {
-    const loadSeries = async () => {
-      // Get the series for each stock
-      const promises = state.stocks.map(async (stock: UserStock) => {
-        const { values } = await timeSeries(stock.symbol, state.interval)
-        return { symbol: stock.symbol, data: values }
-      })
-
-      let series: Serie[] = await Promise.all(promises)
-      const minLength = Math.min(...series.map((serie) => serie.data.length))
-      // keep series with the same length
-      series = series.map((serie) => ({ ...serie, data: serie.data.slice(0, minLength) }))
-      let sortedSeries: Serie[] = series.map((serie: Serie) => ({ symbol: serie.symbol, data: serie.data.reverse() }))
-
-      dispatch({ type: 'SET_SERIES', payload: sortedSeries })
-    }
-    loadSeries()
-  }, [state.stocks, state.interval])
 
   const actions = {
     setSeries: (payload: Serie[]) => dispatch({ type: 'SET_SERIES', payload }),
