@@ -87,23 +87,22 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
     const { data } = await supabase.from('user_stocks').select('*').eq('user_id', user?.id)
 
     if (data) {
-      // Get the current price for each stock
-      const promises = data.map(async (stock: UserStock) => {
-        return await endOfDatePrice(stock.symbol)
+      // Get the series for each stock
+      const series = await loadSeries(data)
+      // Get the last price for each stock searching close price from the last serie
+      const lastPriceSeries = series.map((serie: Serie) => {
+        const length = serie.data.length
+        const lastPrice: number = Number(serie.data[length - 1]?.close)
+        return { symbol: serie.symbol, lastPrice }
       })
 
-      const result = await Promise.all(promises)
-      console.debug('loadStocks', result)
-
-      // Merge it with the stock object
-      const updatedStocks = data.map((stock: UserStock) => {
-        const price = result.find((price) => price.symbol === stock.symbol)
-        return { ...stock, current_price: Number(price?.close) }
+      // Combine the stocks with the last price
+      const combinedStocks = data.map((stock: UserStock) => {
+        const lastPrice = lastPriceSeries.find((serie) => serie.symbol === stock.symbol)?.lastPrice
+        return { ...stock, current_price: lastPrice }
       })
 
-      const series = await loadSeries(updatedStocks)
-
-      dispatch({ type: 'SET_STOCKS', payload: updatedStocks })
+      dispatch({ type: 'SET_STOCKS', payload: combinedStocks })
       dispatch({ type: 'SET_SERIES', payload: series })
     }
   }
