@@ -20,8 +20,6 @@ export default function Overview(props: Props) {
   const { data, stocks } = useUserStocks()
   const { user } = useSupabase()
 
-  console.debug('Overview', { data })
-
   const isInProfit = useMemo(() => Number(data?.profitLoss) > 0, [data.profitLoss])
 
   const isLoggedIn = useMemo(() => {

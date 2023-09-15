@@ -13,8 +13,6 @@ export function SupabaseProvider({ children, userSession }: { children: React.Re
   const [session, setSession] = useState<Session | null>(userSession)
   const [user, setUser] = useState<User | null>(userSession?.user ?? null)
 
-  console.debug('SupabaseProvider', { supabase, userSession, user })
-
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
@@ -22,7 +20,6 @@ export function SupabaseProvider({ children, userSession }: { children: React.Re
     })
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log(`Supabase onAuthStateChange: ${event}`)
       if (event === 'INITIAL_SESSION') return
       if (event === 'SIGNED_OUT') {
         setSession(null)
@@ -42,7 +39,6 @@ export function SupabaseProvider({ children, userSession }: { children: React.Re
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut()
-    console.debug('handleLogout', error)
   }
 
   const supa: UserSession = {

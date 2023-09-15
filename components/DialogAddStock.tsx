@@ -69,13 +69,10 @@ export default function DialogAddStock(props: Props) {
   const [state, dispatch] = useReducer(reducer, initialState)
   const { supabase, user } = useSupabase()
 
-  console.debug('Rendering DialogAddStock', { state, user })
-
   const changeQuery = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     if (value.length > 0) {
       const data = await searchStock(value) // state.query
-      console.log('searchStock', data.data)
       dispatch({ type: 'SET_RESULTS', payload: data.data })
       dispatch({ type: 'SET_QUERY', payload: value })
     }
@@ -86,8 +83,6 @@ export default function DialogAddStock(props: Props) {
   const handleChangePrice = useMemo(() => debounce((e) => dispatch({ type: 'SET_PRICE', payload: Number(e.target.value) }), 500), [])
 
   const handleSubmit = async () => {
-    console.log('handleSubmit')
-
     dispatch({ type: 'SET_LOADING', payload: true })
 
     const { data, error } = await supabase
@@ -110,7 +105,6 @@ export default function DialogAddStock(props: Props) {
       toast({ title: 'Success', description: 'Stock added successfully' })
     }
     await loadStocks()
-    console.log('handleSubmit', { data, error })
 
     dispatch({ type: 'SET_LOADING', payload: false })
 

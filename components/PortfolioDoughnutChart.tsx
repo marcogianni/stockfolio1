@@ -17,8 +17,6 @@ const options = {
 export default function PortfolioDoughnutChart() {
   const { stocks } = useUserStocks()
 
-  console.debug('PortfolioDoughnutChart')
-
   const labels = useMemo(() => stocks.map((stock) => stock.symbol), [stocks])
   const data = useMemo(() => stocks.map((stock) => stock.quantity * stock.current_price), [stocks])
 

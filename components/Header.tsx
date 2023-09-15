@@ -11,7 +11,6 @@ import { useSupabase } from '@/contexts/SupabaseContext'
 
 export default function Header() {
   const { user, handleLogout } = useSupabase()
-  console.debug('Header', { user })
 
   const isLoggedIn = useMemo(() => {
     if (!user) return false
