@@ -1,11 +1,12 @@
 import { useMemo } from 'react'
 
 import { TriangleUpIcon } from '@radix-ui/react-icons'
-import { Card, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Empty from '@/components/Empty'
 import OverviewCard from '@/components/OverviewCard'
 import PortfolioChart from '@/components/PortfolioChart'
+import StockViewer from '@/components/StocksViewer'
 
 import { useUserStocks } from '@/contexts/UserStocksContext'
 import { useSupabase } from '@/contexts/SupabaseContext'
@@ -59,15 +60,18 @@ export default function Overview(props: Props) {
           <PortfolioChart />
         </Card>
       </div>
-      <div className="grid grid-cols-1 gap-6 mt-6">
+      <div className="grid grid-cols-1 gap-6 mt-6 mb-0">
         <Card>
           <CardHeader>
-            <CardTitle>
+            <CardTitle className="mb-0">
               <div className="flex justify-between items-center">
                 <span>Stocks</span>
                 <Button onClick={props.handleOpenDialog}>Add Stocks</Button>
               </div>
             </CardTitle>
+            <CardContent>
+              <StockViewer />
+            </CardContent>
           </CardHeader>
         </Card>
       </div>

@@ -82,6 +82,7 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
   )
 
   const loadStocks = async () => {
+    // TODO IMPROVEMENT: check if the user has already the stocks SERIES loaded
     if (!user) return
     // Get all stocks for the current user
     const { data } = await supabase.from('user_stocks').select('*').eq('user_id', user?.id)
