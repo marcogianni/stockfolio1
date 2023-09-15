@@ -4,12 +4,11 @@ import { Line } from 'react-chartjs-2'
 import { useUserStocks } from '@/contexts/UserStocksContext'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Tooltip } from 'chart.js'
 
-type Props = {}
-
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip)
 
 export const options = {
   responsive: true,
+  maintainAspectRatio: false,
   elements: {
     point: {
       radius: 0,
@@ -32,7 +31,7 @@ export const options = {
   },
 }
 
-export default function PortfolioChart(props: Props) {
+export default function PortfolioLineChart() {
   const { series, stocks, data } = useUserStocks()
 
   console.debug('PortfolioChart')
@@ -93,7 +92,7 @@ export default function PortfolioChart(props: Props) {
   }
 
   return (
-    <div className="p-10">
+    <div className="p-5 h-[400px]">
       <Line options={options} data={config} />
       {/* <Line options={options} data={purchasePriceConfig} /> */}
     </div>

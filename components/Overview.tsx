@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Empty from '@/components/Empty'
 import OverviewCard from '@/components/OverviewCard'
-import PortfolioChart from '@/components/PortfolioChart'
+import PortfolioLineChart from '@/components/PortfolioLineChart'
+import PortfolioDoughnutChart from '@/components/PortfolioDoughnutChart'
 import StockViewer from '@/components/StocksViewer'
 
 import { useUserStocks } from '@/contexts/UserStocksContext'
@@ -55,9 +56,12 @@ export default function Overview(props: Props) {
           </div>
         </OverviewCard>
       </div>
-      <div className="grid grid-cols-1 gap-6 mt-6">
-        <Card>
-          <PortfolioChart />
+      <div className="grid grid-cols-12 gap-6 mt-6">
+        <Card className="col-span-9 inline-block relative">
+          <PortfolioLineChart />
+        </Card>
+        <Card className="col-span-3">
+          <PortfolioDoughnutChart />
         </Card>
       </div>
       <div className="grid grid-cols-1 gap-6 mt-6 mb-0">
