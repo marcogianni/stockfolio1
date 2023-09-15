@@ -28,7 +28,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const { data, error } = await supabase.auth.getSession()
   const session = data?.session ?? null
 
-  console.debug('RootLayout', session)
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
