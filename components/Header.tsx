@@ -6,7 +6,6 @@ import Link from 'next/link'
 import ThemeSwitcher from '@/components/ThemeSwitcher'
 import LoginDialog from '@/components/LoginDialog'
 import { Button } from '@/components/ui/button'
-import { PersonIcon } from '@radix-ui/react-icons'
 
 import { useSupabase } from '@/contexts/SupabaseContext'
 
