@@ -1,16 +1,14 @@
-'use client'
-
-import { useUserStocks } from '@/contexts/UserStocksContext'
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Tooltip } from 'chart.js'
 import { useMemo } from 'react'
 import { Line } from 'react-chartjs-2'
 
-type Props = {}
+import { useUserStocks } from '@/contexts/UserStocksContext'
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Tooltip } from 'chart.js'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip)
 
 export const options = {
   responsive: true,
+  maintainAspectRatio: false,
   elements: {
     point: {
       radius: 0,
@@ -28,16 +26,15 @@ export const options = {
       position: 'top' as const,
     },
     title: {
-      display: true,
-      text: 'Chart.js Line Chart',
+      display: false,
     },
   },
 }
 
-export default function PortfolioChart(props: Props) {
+export default function PortfolioLineChart() {
   const { series, stocks, data } = useUserStocks()
 
-  console.debug('Rendering PortfolioChart', { series })
+  console.debug('PortfolioChart')
 
   const getStockQuantity = (symbol: string): number => {
     // given a stock symbol, return the quantity from the stocks array
@@ -79,7 +76,7 @@ export default function PortfolioChart(props: Props) {
       {
         label: 'Portfolio Value',
         data: values,
-        fill: true,
+        fill: false,
         backgroundColor: isProfit ? '#22c55e' : '#e11d48',
         borderColor: isProfit ? '#22c55e' : '#e11d48',
       },
@@ -95,7 +92,7 @@ export default function PortfolioChart(props: Props) {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-5 h-[300px] md:h-[400px]">
       <Line options={options} data={config} />
       {/* <Line options={options} data={purchasePriceConfig} /> */}
     </div>

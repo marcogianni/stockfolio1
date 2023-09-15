@@ -3,7 +3,7 @@
 import { createContext, useEffect, useReducer, useContext, useMemo } from 'react'
 import { useSupabase } from '@/contexts/SupabaseContext'
 import { timeSeries, endOfDatePrice } from '@/api/twelvedata'
-import { Serie, UserStock } from '@/lib/types'
+import { Serie, Stock, UserStock } from '@/lib/types'
 
 type UserStocksContextType = {
   series: Serie[]
@@ -25,6 +25,9 @@ export const UserStocksContext = createContext({} as UserStocksContextType)
 
 const reducer = (state: any, action: any) => {
   switch (action.type) {
+    case 'RESET': {
+      return initialState
+    }
     case 'SET_SERIES':
       return { ...state, series: action.payload }
     case 'SET_STOCKS':
@@ -51,7 +54,7 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
   const [state, dispatch] = useReducer(reducer, initialState)
   const { supabase, user } = useSupabase()
 
-  console.debug('Rendering UserStocksProvider', { state, user })
+  console.debug('UserStocksProvider', { state, user })
 
   const totalInvested: number = useMemo(
     () =>
@@ -79,51 +82,54 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
   )
 
   const loadStocks = async () => {
+    // TODO IMPROVEMENT: check if the user has already the stocks SERIES loaded
     if (!user) return
     // Get all stocks for the current user
     const { data } = await supabase.from('user_stocks').select('*').eq('user_id', user?.id)
 
     if (data) {
-      // Get the current price for each stock
-      const promises = data.map(async (stock: UserStock) => {
-        return await endOfDatePrice(stock.symbol)
+      // Get the series for each stock
+      const series = await loadSeries(data)
+      // Get the last price for each stock searching close price from the last serie
+      const lastPriceSeries = series.map((serie: Serie) => {
+        const length = serie.data.length
+        const lastPrice: number = Number(serie.data[length - 1]?.close)
+        return { symbol: serie.symbol, lastPrice }
       })
 
-      const result = await Promise.all(promises)
-      console.debug('loadStocks', result)
-
-      // Merge it with the stock object
-      const updatedStocks = data.map((stock: UserStock) => {
-        const price = result.find((price) => price.symbol === stock.symbol)
-        return { ...stock, current_price: Number(price?.close) }
+      // Combine the stocks with the last price
+      const combinedStocks = data.map((stock: UserStock) => {
+        const lastPrice = lastPriceSeries.find((serie) => serie.symbol === stock.symbol)?.lastPrice
+        return { ...stock, current_price: lastPrice }
       })
 
-      dispatch({ type: 'SET_STOCKS', payload: updatedStocks })
+      dispatch({ type: 'SET_STOCKS', payload: combinedStocks })
+      dispatch({ type: 'SET_SERIES', payload: series })
     }
   }
 
+  const loadSeries = async (stocks: UserStock[]) => {
+    // Get the series for each stock
+    const promises = stocks.map(async (stock: UserStock) => {
+      const { values } = await timeSeries(stock.symbol, state.interval)
+      return { symbol: stock.symbol, data: values ?? null }
+    })
+
+    let series: Serie[] = await Promise.all(promises)
+    const minLength = Math.min(...series.map((serie) => serie?.data?.length))
+    // keep series with the same length
+    series = series.map((serie) => ({ ...serie, data: serie?.data?.slice(0, minLength) }))
+    let sortedSeries: Serie[] = series.map((serie: Serie) => ({ symbol: serie.symbol, data: serie.data.reverse() }))
+    return sortedSeries
+  }
+
   useEffect(() => {
+    if (!user) {
+      dispatch({ type: 'RESET' })
+      return
+    }
     loadStocks()
   }, [user?.id])
-
-  useEffect(() => {
-    const loadSeries = async () => {
-      // Get the series for each stock
-      const promises = state.stocks.map(async (stock: UserStock) => {
-        const { values } = await timeSeries(stock.symbol, state.interval)
-        return { symbol: stock.symbol, data: values }
-      })
-
-      let series: Serie[] = await Promise.all(promises)
-      const minLength = Math.min(...series.map((serie) => serie.data.length))
-      // keep series with the same length
-      series = series.map((serie) => ({ ...serie, data: serie.data.slice(0, minLength) }))
-      let sortedSeries: Serie[] = series.map((serie: Serie) => ({ symbol: serie.symbol, data: serie.data.reverse() }))
-
-      dispatch({ type: 'SET_SERIES', payload: sortedSeries })
-    }
-    loadSeries()
-  }, [state.stocks, state.interval])
 
   const actions = {
     setSeries: (payload: Serie[]) => dispatch({ type: 'SET_SERIES', payload }),

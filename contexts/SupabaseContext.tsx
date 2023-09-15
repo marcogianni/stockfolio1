@@ -2,35 +2,37 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import type { SupabaseClient } from '@supabase/auth-helpers-nextjs'
-import type { Database } from '@/lib/database.types'
 import { Session, User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase-browser'
-
-type UserSession = {
-  supabase: SupabaseClient<Database>
-  userSession: Session | null
-  user: User | null
-}
+import { UserSession } from '@/lib/types'
 
 const Context = createContext({} as UserSession)
 
-export function SupabaseProvider({ children }: { children: React.ReactNode }) {
+export function SupabaseProvider({ children, userSession }: { children: React.ReactNode; userSession: Session | null }) {
   const [supabase] = useState(() => createClient())
-  const [userSession, setUserSession] = useState<Session | null>(null)
-  const [user, setUser] = useState<User | null>(null)
+  const [session, setSession] = useState<Session | null>(userSession)
+  const [user, setUser] = useState<User | null>(userSession?.user ?? null)
+
+  console.debug('SupabaseProvider', { supabase, userSession, user })
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUserSession(session)
-      setUser(session?.user ?? null)
+      setSession(session)
+      setUser(userSession?.user ?? null)
     })
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       console.log(`Supabase onAuthStateChange: ${event}`)
       if (event === 'INITIAL_SESSION') return
-      setUserSession(session)
-      setUser(session?.user ?? null)
+      if (event === 'SIGNED_OUT') {
+        setSession(null)
+        setUser(null)
+        return
+      }
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setSession(session)
+        setUser(userSession?.user ?? null)
+      })
     })
 
     return () => {
@@ -38,11 +40,19 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut()
+    console.debug('handleLogout', error)
+  }
+
   const supa: UserSession = {
     supabase,
-    userSession,
-    user,
+    userSession: session,
+    user: session?.user ?? null,
+    handleLogout,
   }
+
+  const actions = {}
 
   return <Context.Provider value={supa}>{children}</Context.Provider>
 }

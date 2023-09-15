@@ -22,12 +22,7 @@ export const searchStock = async (symbol: string) => {
   }
 }
 
-export const timeSeries = async (
-  symbol: string,
-  interval: '1h' | '4h' | '1day' | '1week' | '1month'
-  // startDate: string,
-  // endDate: string
-) => {
+export const timeSeries = async (symbol: string, interval: '1h' | '4h' | '1day' | '1week' | '1month') => {
   const options = {
     method: 'GET',
     url: `https://api.twelvedata.com/time_series`,
@@ -36,8 +31,6 @@ export const timeSeries = async (
       interval: interval,
       apikey: process.env.NEXT_TWELVEDATA,
       outputsize: 200, // Supports values in the range from 1 to 5000 (default 30)
-      // start_date: startDate,
-      // end_date: endDate,
     },
     headers,
   }

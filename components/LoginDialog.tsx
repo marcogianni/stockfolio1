@@ -109,7 +109,6 @@ const FormLogin = ({ switchMode, handleClose }: { switchMode: () => void; handle
     }
 
     console.debug('handleSignIn', { data, error })
-    router.refresh()
     setLoading(false)
     handleClose()
   }

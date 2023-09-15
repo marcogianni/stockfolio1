@@ -1,12 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
-
-type Stock = {
-  symbol: string
-  currency: string
-  exchange: string
-  instrumentName: string
-}
+import { Stock } from '@/lib/types'
 
 export const columns: ColumnDef<Stock>[] = [
   {
