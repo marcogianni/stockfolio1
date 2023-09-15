@@ -10,7 +10,7 @@ export default function SplashScreen() {
       <div className="p-10 rounded-xl relative flex justify-center flex-col">
         <div className="flex justify-center flex-col items-center" style={{ width: 180 }}>
           <span className="hidden text-2xl font-bold sm:inline-block" style={{ color: 'white' }}>
-            Stockfolio
+            Stockfolio1
           </span>
         </div>
       </div>
