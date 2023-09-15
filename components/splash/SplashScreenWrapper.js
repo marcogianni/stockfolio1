@@ -11,7 +11,7 @@ export default function SplashScreenWrapper({ children }) {
   useEffect(() => {
     setTimeout(() => {
       setLoading(false)
-    }, 1000)
+    }, 1100)
   }, [])
 
   return (

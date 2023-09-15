@@ -20,9 +20,7 @@ export default function StockViewer() {
           <div className="flex grid-cols-6 gap-6 mt-4 items-center">
             <div className="flex-1">
               <div className="text-sm">Stock</div>
-              <div className="text-lg font-bold">
-                {stock.symbol} | {stock.instrument_name}
-              </div>
+              <div className="text-lg font-bold">{stock.symbol}</div>
             </div>
             <div className="flex-1">
               <div className="text-sm">Quantity</div>

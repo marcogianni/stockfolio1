@@ -52,7 +52,7 @@ export default function Overview(props: Props) {
                 transform: isInProfit ? 'rotate(0deg)' : 'rotate(180deg)',
               }}
             />
-            <span>{data?.profitLoss}%</span>
+            <span>{data?.profitLoss.replace('-', '')}%</span>
           </div>
         </OverviewCard>
       </div>
@@ -64,7 +64,7 @@ export default function Overview(props: Props) {
           <PortfolioDoughnutChart />
         </Card>
       </div>
-      <div className="grid grid-cols-1 gap-6 mt-6 mb-0">
+      <div className="grid grid-cols-1 gap-6 mt-6 mb-6">
         <Card>
           <CardHeader>
             <CardTitle className="mb-0">
