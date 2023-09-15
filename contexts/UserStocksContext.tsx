@@ -25,6 +25,9 @@ export const UserStocksContext = createContext({} as UserStocksContextType)
 
 const reducer = (state: any, action: any) => {
   switch (action.type) {
+    case 'RESET': {
+      return initialState
+    }
     case 'SET_SERIES':
       return { ...state, series: action.payload }
     case 'SET_STOCKS':
@@ -121,7 +124,10 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
   }
 
   useEffect(() => {
-    if (!user) return
+    if (!user) {
+      dispatch({ type: 'RESET' })
+      return
+    }
     loadStocks()
   }, [user?.id])
 

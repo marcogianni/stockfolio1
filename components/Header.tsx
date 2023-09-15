@@ -11,17 +11,13 @@ import { PersonIcon } from '@radix-ui/react-icons'
 import { useSupabase } from '@/contexts/SupabaseContext'
 
 export default function Header() {
-  const { supabase, user } = useSupabase()
+  const { supabase, user, handleLogout } = useSupabase()
   console.debug('Header', { user })
 
   const isLoggedIn = useMemo(() => {
     if (!user) return false
     return true
   }, [user])
-
-  const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut()
-  }
 
   return (
     <header className="supports-backdrop-blur:bg-background/60 sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur">

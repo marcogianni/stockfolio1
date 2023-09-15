@@ -31,6 +31,7 @@ export type UserSession = {
   supabase: SupabaseClient<Database>
   userSession: Session | null
   user: User | null
+  handleLogout: () => void
 }
 
 export type Stock = {
