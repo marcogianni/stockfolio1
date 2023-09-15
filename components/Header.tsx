@@ -11,7 +11,7 @@ import { PersonIcon } from '@radix-ui/react-icons'
 import { useSupabase } from '@/contexts/SupabaseContext'
 
 export default function Header() {
-  const { supabase, user, handleLogout } = useSupabase()
+  const { user, handleLogout } = useSupabase()
   console.debug('Header', { user })
 
   const isLoggedIn = useMemo(() => {

@@ -8,6 +8,7 @@ import OverviewCard from '@/components/OverviewCard'
 import PortfolioChart from '@/components/PortfolioChart'
 
 import { useUserStocks } from '@/contexts/UserStocksContext'
+import { useSupabase } from '@/contexts/SupabaseContext'
 
 type Props = {
   handleOpenDialog: () => void
@@ -15,13 +16,19 @@ type Props = {
 
 export default function Overview(props: Props) {
   const { data, stocks } = useUserStocks()
+  const { user } = useSupabase()
 
   console.debug('Overview', { data })
 
   const isInProfit = useMemo(() => Number(data?.profitLoss) > 0, [data.profitLoss])
 
-  if (stocks.length === 0) {
-    return <Empty handleOpenDialog={props.handleOpenDialog} />
+  const isLoggedIn = useMemo(() => {
+    if (!user) return false
+    return true
+  }, [user])
+
+  if (stocks.length === 0 || !isLoggedIn) {
+    return <Empty handleOpenDialog={props.handleOpenDialog} isLoggedIn={isLoggedIn} />
   }
 
   return (
