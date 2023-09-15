@@ -23,7 +23,7 @@ export default function Header() {
       <div className="container flex h-14 items-center">
         <div className="mr-4 md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <span className="font-bold sm:inline-block">Stockfolio</span>
+            <span className="font-bold sm:inline-block">Stockfolio1</span>
           </Link>
           <nav className="md:flex hidden items-center space-x-6 text-sm font-medium">
             <Link href="/dashboard" className="transition-colors hover:text-foreground/80 text-foreground/60">
