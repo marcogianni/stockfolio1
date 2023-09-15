@@ -27,8 +27,7 @@ export const options = {
       position: 'top' as const,
     },
     title: {
-      display: true,
-      text: 'Chart.js Line Chart',
+      display: false,
     },
   },
 }
@@ -78,7 +77,7 @@ export default function PortfolioChart(props: Props) {
       {
         label: 'Portfolio Value',
         data: values,
-        fill: true,
+        fill: false,
         backgroundColor: isProfit ? '#22c55e' : '#e11d48',
         borderColor: isProfit ? '#22c55e' : '#e11d48',
       },

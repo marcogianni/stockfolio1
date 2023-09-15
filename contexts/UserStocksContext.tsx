@@ -51,7 +51,7 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
   const [state, dispatch] = useReducer(reducer, initialState)
   const { supabase, user } = useSupabase()
 
-  console.debug('UserStocksProvider')
+  console.debug('UserStocksProvider', { state, user })
 
   const totalInvested: number = useMemo(
     () =>
@@ -106,7 +106,6 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
   }
 
   const loadSeries = async (stocks: UserStock[]) => {
-    console.debug('loadSeries', stocks)
     // Get the series for each stock
     const promises = stocks.map(async (stock: UserStock) => {
       const { values } = await timeSeries(stock.symbol, state.interval)
@@ -114,7 +113,6 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
     })
 
     let series: Serie[] = await Promise.all(promises)
-    console.debug('loadSeries', series)
     const minLength = Math.min(...series.map((serie) => serie?.data?.length))
     // keep series with the same length
     series = series.map((serie) => ({ ...serie, data: serie?.data?.slice(0, minLength) }))
@@ -123,6 +121,7 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
   }
 
   useEffect(() => {
+    if (!user) return
     loadStocks()
   }, [user?.id])
 

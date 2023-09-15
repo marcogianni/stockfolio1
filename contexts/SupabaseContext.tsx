@@ -8,24 +8,22 @@ import { UserSession } from '@/lib/types'
 
 const Context = createContext({} as UserSession)
 
-export function SupabaseProvider({ children }: { children: React.ReactNode }) {
+export function SupabaseProvider({ children, userSession }: { children: React.ReactNode; userSession: Session | null }) {
   const [supabase] = useState(() => createClient())
-  const [userSession, setUserSession] = useState<Session | null>(null)
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User | null>(userSession?.user ?? null)
 
-  console.debug('SupabaseProvider')
+  console.debug('SupabaseProvider', { supabase, userSession, user })
 
   useEffect(() => {
+    if (!userSession) return
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUserSession(session)
-      setUser(session?.user ?? null)
+      setUser(userSession?.user ?? null)
     })
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       console.log(`Supabase onAuthStateChange: ${event}`)
       if (event === 'INITIAL_SESSION') return
-      setUserSession(session)
-      setUser(session?.user ?? null)
+      setUser(userSession?.user ?? null)
     })
 
     return () => {
@@ -36,7 +34,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   const supa: UserSession = {
     supabase,
     userSession,
-    user,
+    user: userSession?.user ?? null,
   }
 
   return <Context.Provider value={supa}>{children}</Context.Provider>
