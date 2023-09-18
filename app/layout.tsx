@@ -13,6 +13,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
 import { cookies } from 'next/headers'
 import { Database } from '@/lib/database.types'
+import { ExchangeRatesProvider } from '@/contexts/ExchangeRates'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -37,10 +38,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <SplashScreenWrapper>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
             <SupabaseProvider userSession={session}>
-              <UserStocksProvider>
-                <Header />
-                {children}
-              </UserStocksProvider>
+              <ExchangeRatesProvider>
+                <UserStocksProvider>
+                  <Header />
+                  {children}
+                </UserStocksProvider>
+              </ExchangeRatesProvider>
             </SupabaseProvider>
             <Toaster />
           </ThemeProvider>

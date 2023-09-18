@@ -3,6 +3,7 @@ import { Doughnut } from 'react-chartjs-2'
 
 import { useUserStocks } from '@/contexts/UserStocksContext'
 import { useMemo } from 'react'
+import { UserStock } from '@/lib/types'
 
 ChartJS.register(ArcElement, Tooltip, Colors)
 
@@ -10,17 +11,20 @@ const options = {
   responsive: true,
   maintainAspectRatio: false,
   colors: {
-    enabled: false,
+    enabled: true,
+  },
+  plugins: {
+    colors: {
+      forceOverride: true,
+    },
   },
 }
 
 export default function PortfolioDoughnutChart() {
   const { stocks } = useUserStocks()
 
-  console.debug('PortfolioDoughnutChart')
-
-  const labels = useMemo(() => stocks.map((stock) => stock.symbol), [stocks])
-  const data = useMemo(() => stocks.map((stock) => stock.quantity * stock.current_price), [stocks])
+  const labels = useMemo(() => stocks.map((stock: UserStock) => stock.symbol), [stocks])
+  const data = useMemo(() => stocks.map((stock: UserStock) => stock.quantity * stock?.current_price), [stocks])
 
   const config = {
     labels: labels,

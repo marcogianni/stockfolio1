@@ -108,7 +108,6 @@ const FormLogin = ({ switchMode, handleClose }: { switchMode: () => void; handle
       })
     }
 
-    console.debug('handleSignIn', { data, error })
     setLoading(false)
     handleClose()
   }
@@ -193,7 +192,6 @@ const FormRegister = ({ switchMode, handleClose }: { switchMode: () => void; han
       },
     })
 
-    console.debug('handleSignUp', { data, error })
     if (error) {
       toast({
         title: 'Error',
@@ -201,7 +199,6 @@ const FormRegister = ({ switchMode, handleClose }: { switchMode: () => void; han
       })
     }
 
-    console.debug('handleSignIn', error?.message)
     router.refresh()
     setLoading(false)
     handleClose()

@@ -2,8 +2,10 @@
 
 import { createContext, useEffect, useReducer, useContext, useMemo } from 'react'
 import { useSupabase } from '@/contexts/SupabaseContext'
-import { timeSeries, endOfDatePrice } from '@/api/twelvedata'
-import { Serie, Stock, UserStock } from '@/lib/types'
+import { timeSeries } from '@/api/twelvedata'
+import { LastPrice, Serie, UserStock, SupabaseStock } from '@/lib/types'
+import { getSeriesLastPrice, marshalTwelveDataSeries, stocksWithCurrentPrice } from '@/lib/utils'
+import { useExchangeRates } from './ExchangeRates'
 
 type UserStocksContextType = {
   series: Serie[]
@@ -13,21 +15,22 @@ type UserStocksContextType = {
     setStocks: (payload: UserStock[]) => void
     addStock: (payload: UserStock) => void
     loadStocks: () => void
+    deleteStock: (payload: UserStock) => void
   }
   data: {
     totalInvested: number
     portfolioValue: number
     profitLoss: string
   }
+  exchangeRates: {}
 }
 
 export const UserStocksContext = createContext({} as UserStocksContextType)
 
 const reducer = (state: any, action: any) => {
   switch (action.type) {
-    case 'RESET': {
+    case 'RESET':
       return initialState
-    }
     case 'SET_SERIES':
       return { ...state, series: action.payload }
     case 'SET_STOCKS':
@@ -35,7 +38,11 @@ const reducer = (state: any, action: any) => {
     case 'ADD_STOCK':
       return { ...state, stocks: [...state.stocks, action.payload] }
     case 'DELETE_STOCK':
-      return { ...state, stocks: state.stocks.filter((stock: UserStock) => stock.id !== action.payload) }
+      return {
+        ...state,
+        stocks: state.stocks.filter((stock: UserStock) => stock.id !== action.payload.id),
+        series: state.series.filter((serie: Serie) => serie.symbol !== action.payload.symbol),
+      }
     case 'SET_INTERVAL':
       return { ...state, interval: action.payload }
 
@@ -53,14 +60,15 @@ const initialState = {
 export const UserStocksProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const { supabase, user } = useSupabase()
+  const { rates } = useExchangeRates()
 
-  console.debug('UserStocksProvider', { state, user })
+  console.debug('RATES', rates)
 
   const totalInvested: number = useMemo(
     () =>
       state.stocks
         .reduce((acc: number, stock: UserStock) => {
-          return acc + stock.quantity * stock.purchase_price
+          return acc + stock.quantity * stock.purchase_price * (rates[stock.currency] ?? 1)
         }, 0)
         .toFixed(2),
     [state.stocks]
@@ -70,7 +78,8 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
     () =>
       state.stocks
         .reduce((acc: number, stock: UserStock) => {
-          return acc + stock.quantity * stock.current_price
+          const currentPrice = stock?.current_price ?? 0
+          return acc + stock.quantity * currentPrice
         }, 0)
         .toFixed(2),
     [state.stocks]
@@ -82,45 +91,33 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
   )
 
   const loadStocks = async () => {
-    // TODO IMPROVEMENT: check if the user has already the stocks SERIES loaded
     if (!user) return
     // Get all stocks for the current user
     const { data } = await supabase.from('user_stocks').select('*').eq('user_id', user?.id)
 
     if (data) {
       // Get the series for each stock
-      const series = await loadSeries(data)
+      const series: Serie[] = await loadSeries(data)
       // Get the last price for each stock searching close price from the last serie
-      const lastPriceSeries = series.map((serie: Serie) => {
-        const length = serie.data.length
-        const lastPrice: number = Number(serie.data[length - 1]?.close)
-        return { symbol: serie.symbol, lastPrice }
-      })
-
+      const lastPriceSeries: LastPrice[] = getSeriesLastPrice(series)
       // Combine the stocks with the last price
-      const combinedStocks = data.map((stock: UserStock) => {
-        const lastPrice = lastPriceSeries.find((serie) => serie.symbol === stock.symbol)?.lastPrice
-        return { ...stock, current_price: lastPrice }
-      })
+      const stocksWithPrice = stocksWithCurrentPrice(lastPriceSeries, data)
 
-      dispatch({ type: 'SET_STOCKS', payload: combinedStocks })
+      dispatch({ type: 'SET_STOCKS', payload: stocksWithPrice })
       dispatch({ type: 'SET_SERIES', payload: series })
     }
   }
 
-  const loadSeries = async (stocks: UserStock[]) => {
+  const loadSeries = async (stocks: SupabaseStock[]) => {
     // Get the series for each stock
-    const promises = stocks.map(async (stock: UserStock) => {
+    const promises = stocks.map(async (stock: SupabaseStock) => {
       const { values } = await timeSeries(stock.symbol, state.interval)
       return { symbol: stock.symbol, data: values ?? null }
     })
 
-    let series: Serie[] = await Promise.all(promises)
-    const minLength = Math.min(...series.map((serie) => serie?.data?.length))
-    // keep series with the same length
-    series = series.map((serie) => ({ ...serie, data: serie?.data?.slice(0, minLength) }))
-    let sortedSeries: Serie[] = series.map((serie: Serie) => ({ symbol: serie.symbol, data: serie.data.reverse() }))
-    return sortedSeries
+    const series: Serie[] = await Promise.all(promises)
+    const cleanedSeries = marshalTwelveDataSeries(series)
+    return cleanedSeries
   }
 
   useEffect(() => {
@@ -135,6 +132,7 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
     setSeries: (payload: Serie[]) => dispatch({ type: 'SET_SERIES', payload }),
     setStocks: (payload: UserStock[]) => dispatch({ type: 'SET_STOCKS', payload }),
     addStock: (payload: UserStock) => dispatch({ type: 'ADD_STOCK', payload }),
+    deleteStock: (payload: UserStock) => dispatch({ type: 'DELETE_STOCK', payload }),
     loadStocks,
   }
 
@@ -145,7 +143,7 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <UserStocksContext.Provider value={{ series: state.series, stocks: state.stocks, actions, data }}>
+    <UserStocksContext.Provider value={{ series: state.series, stocks: state.stocks, exchangeRates: state.exchangeRates, actions, data }}>
       {children}
     </UserStocksContext.Provider>
   )
