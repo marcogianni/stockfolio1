@@ -1,23 +1,40 @@
-import { Card, CardContent } from '@/components/ui/card'
-import { useUserStocks } from '@/contexts/UserStocksContext'
 import { UserStock } from '@/lib/types'
 
-import { Pencil1Icon, TrashIcon } from '@radix-ui/react-icons'
+import { useSupabase } from '@/contexts/SupabaseContext'
+import { useUserStocks } from '@/contexts/UserStocksContext'
 
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Pencil1Icon, TrashIcon } from '@radix-ui/react-icons'
+import { toast } from '@/components/ui/use-toast'
 
 export default function StockViewer() {
-  const { stocks } = useUserStocks()
+  const { stocks, actions } = useUserStocks()
+  const { supabase, user } = useSupabase()
+  const { deleteStock } = actions
 
   if (stocks.length === 0) {
     return null
   }
 
+  const handleClick = async (id: number) => {
+    const { error } = await supabase.from('user_stocks').delete().eq('id', id)
+    console.debug('handleClick', error)
+
+    if (error) {
+      return toast({ title: 'Error', description: error.message })
+    } else {
+      deleteStock(id)
+      return toast({ title: 'Success', description: 'Stock deleted successfully' })
+    }
+  }
+
   return stocks.map(
     (stock: UserStock): React.ReactNode => (
       <Card className="mt-4" key={stock.id}>
-        <CardContent>
-          <div className="flex grid-cols-6 gap-6 mt-4 items-center flex-wrap md:flex-nowrap">
+        <CardContent className="p-3">
+          <div className="flex grid-cols-6 gap-6 items-center flex-wrap md:flex-nowrap">
             <div className="md:flex-1">
               <div className="text-sm">Stock</div>
               <div className="text-lg font-bold">{stock.symbol}</div>
@@ -43,9 +60,18 @@ export default function StockViewer() {
               <Button variant="outline" size="icon">
                 <Pencil1Icon className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon" className="ml-2">
-                <TrashIcon className="h-4 w-4" />
-              </Button>
+              <TooltipProvider delayDuration={100}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" className="ml-2" onClick={() => handleClick(stock.id)}>
+                      <TrashIcon className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Delete Stock</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
         </CardContent>

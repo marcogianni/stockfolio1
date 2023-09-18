@@ -16,15 +16,9 @@ export interface TimeSeries {
   volume: number
 }
 
-export interface UserStock {
-  id: number
+export interface LastPrice {
   symbol: string
-  currency: string
-  exchange: string
-  instrument_name: string
-  quantity: number
-  purchase_price: number
-  current_price: number
+  lastPrice: number
 }
 
 export type UserSession = {
@@ -34,9 +28,29 @@ export type UserSession = {
   handleLogout: () => void
 }
 
-export type Stock = {
+export type SupabaseStock = {
+  created_at: string
+  exchange: string
+  id: number
+  instrument_name: string
+  mic_code: string
+  purchase_price: number
+  quantity: number
+  symbol: string
+  updated_at: string
+  currency: string
+  user_id: string
+}
+
+export interface UserStock {
+  id: number
+  user_id: string
   symbol: string
   currency: string
   exchange: string
-  instrumentName: string
+  instrument_name: string
+  quantity: number
+  purchase_price: number
+  current_price: number | undefined
+  mic_code: string
 }
