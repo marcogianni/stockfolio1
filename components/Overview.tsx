@@ -1,4 +1,6 @@
-import { useMemo } from 'react'
+'use client'
+
+import { useCallback, useMemo, useState } from 'react'
 
 import { TriangleUpIcon } from '@radix-ui/react-icons'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -8,29 +10,49 @@ import OverviewCard from '@/components/OverviewCard'
 import PortfolioLineChart from '@/components/PortfolioLineChart'
 import PortfolioDoughnutChart from '@/components/PortfolioDoughnutChart'
 import StockViewer from '@/components/StocksViewer'
+import DialogAddStock from '@/components/DialogAddStock'
 
 import { useUserStocks } from '@/contexts/UserStocksContext'
 import { useSupabase } from '@/contexts/SupabaseContext'
+import { UserStock } from '@/lib/types'
+import FormatCurrency from './FormatCurrency'
+import FormatPercentage from './FormatPercentage'
 
-type Props = {
-  handleOpenDialog: () => void
-}
+const initialState: UserStock | null = null
 
-export default function Overview(props: Props) {
+export default function Overview() {
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [editingStock, setEditingStock] = useState(initialState)
+
   const { data, stocks } = useUserStocks()
   const { user } = useSupabase()
 
-  console.debug('Overview', { data })
-
   const isInProfit = useMemo(() => Number(data?.profitLoss) > 0, [data.profitLoss])
+
+  const handleClose = useCallback(() => {
+    setDialogOpen(false)
+    setTimeout(() => {
+      setEditingStock(null)
+    }, 200)
+  }, [])
+
+  const handleEditStock = useCallback((stock: UserStock) => {
+    setEditingStock(stock)
+    setDialogOpen(true)
+  }, [])
 
   const isLoggedIn = useMemo(() => {
     if (!user) return false
     return true
   }, [user])
 
-  if (stocks.length === 0 || !isLoggedIn) {
-    return <Empty handleOpenDialog={props.handleOpenDialog} isLoggedIn={isLoggedIn} />
+  if (stocks.length === 0) {
+    return (
+      <>
+        <Empty handleOpenDialog={() => setDialogOpen(true)} isLoggedIn={isLoggedIn} />
+        <DialogAddStock open={dialogOpen} onClose={handleClose} editingStock={null} />
+      </>
+    )
   }
 
   return (
@@ -38,10 +60,14 @@ export default function Overview(props: Props) {
       <h2 className="text-3xl font-bold tracking-tight">Overview</h2>
       <div className="grid grid-cols-1 gap-6 mt-6 sm:grid-cols-2 lg:grid-cols-3">
         <OverviewCard title="Stockfolio Value" description="The current value of your stockfolio">
-          <div className="text-2xl font-bold">$ {data?.portfolioValue}</div>
+          <div className="text-2xl font-bold">
+            <FormatCurrency value={data?.portfolioValue} />
+          </div>
         </OverviewCard>
         <OverviewCard title="Total Invested" description="The amount invested for these stocks">
-          <div className="text-2xl font-bold">$ {data?.totalInvested}</div>
+          <div className="text-2xl font-bold">
+            <FormatCurrency value={data?.totalInvested} />
+          </div>
         </OverviewCard>
         <OverviewCard title="Total Profit/Loss" description="The total profit/loss for these stocks">
           <div className="text-2xl font-bold flex items-center" style={{ color: isInProfit ? '#22c55e' : '#e11d48' }}>
@@ -52,7 +78,10 @@ export default function Overview(props: Props) {
                 transform: isInProfit ? 'rotate(0deg)' : 'rotate(180deg)',
               }}
             />
-            <span>{data?.profitLoss.replace('-', '')}%</span>
+            <span>
+              {' '}
+              <FormatPercentage value={data?.profitLoss.replace('-', '')} />
+            </span>
           </div>
         </OverviewCard>
       </div>
@@ -70,15 +99,16 @@ export default function Overview(props: Props) {
             <CardTitle className="mb-0">
               <div className="flex justify-between items-center">
                 <span>Stocks</span>
-                <Button onClick={props.handleOpenDialog}>Add Stocks</Button>
+                <Button onClick={() => setDialogOpen(true)}>Add Stocks</Button>
               </div>
             </CardTitle>
             <CardContent className="p-0">
-              <StockViewer />
+              <StockViewer handleEditStock={handleEditStock} />
             </CardContent>
           </CardHeader>
         </Card>
       </div>
+      <DialogAddStock open={dialogOpen} onClose={handleClose} editingStock={editingStock} />
     </div>
   )
 }

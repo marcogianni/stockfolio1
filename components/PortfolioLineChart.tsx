@@ -34,8 +34,6 @@ export const options = {
 export default function PortfolioLineChart() {
   const { series, stocks, data } = useUserStocks()
 
-  console.debug('PortfolioChart')
-
   const getStockQuantity = (symbol: string): number => {
     // given a stock symbol, return the quantity from the stocks array
 
@@ -60,7 +58,6 @@ export default function PortfolioLineChart() {
   }, [series])
 
   const labels = useMemo(() => {
-    console.log('calculateLabels', series)
     if (series.length > 0) {
       return series?.[0]?.data.map((serie) => serie.datetime)
     }
