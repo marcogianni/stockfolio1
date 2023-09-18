@@ -1,13 +1,11 @@
 'use client'
 
 import { getCurrencyExchange } from '@/api/freecurrencyapi'
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useEffect, useState, useContext } from 'react'
 
-type ExchangeRatesContextType = {
-  [currency: string]: number
-}
+type ExchangeRate = Record<string, number>
 
-export const ExchangeRatesContext = createContext({} as ExchangeRatesContextType)
+export const ExchangeRatesContext = createContext({} as { rates: ExchangeRate })
 
 export const ExchangeRatesProvider = ({ children }: { children: React.ReactNode }) => {
   const [rates, setRates] = useState({})
@@ -23,5 +21,15 @@ export const ExchangeRatesProvider = ({ children }: { children: React.ReactNode 
     }
     getRates()
   }, [])
-  return <ExchangeRatesContext.Provider value={{}}>{children}</ExchangeRatesContext.Provider>
+  return <ExchangeRatesContext.Provider value={{ rates }}>{children}</ExchangeRatesContext.Provider>
+}
+
+export const useExchangeRates = () => {
+  const context = useContext(ExchangeRatesContext)
+
+  if (context === undefined) {
+    throw new Error('useExchangeRates must be used within a ExchangeRatesContext')
+  }
+
+  return context
 }

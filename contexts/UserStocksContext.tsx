@@ -5,6 +5,7 @@ import { useSupabase } from '@/contexts/SupabaseContext'
 import { timeSeries } from '@/api/twelvedata'
 import { LastPrice, Serie, UserStock, SupabaseStock } from '@/lib/types'
 import { getSeriesLastPrice, marshalTwelveDataSeries, stocksWithCurrentPrice } from '@/lib/utils'
+import { useExchangeRates } from './ExchangeRates'
 
 type UserStocksContextType = {
   series: Serie[]
@@ -28,9 +29,8 @@ export const UserStocksContext = createContext({} as UserStocksContextType)
 
 const reducer = (state: any, action: any) => {
   switch (action.type) {
-    case 'RESET': {
+    case 'RESET':
       return initialState
-    }
     case 'SET_SERIES':
       return { ...state, series: action.payload }
     case 'SET_STOCKS':
@@ -60,12 +60,15 @@ const initialState = {
 export const UserStocksProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const { supabase, user } = useSupabase()
+  const { rates } = useExchangeRates()
+
+  console.debug('RATES', rates)
 
   const totalInvested: number = useMemo(
     () =>
       state.stocks
         .reduce((acc: number, stock: UserStock) => {
-          return acc + stock.quantity * stock.purchase_price
+          return acc + stock.quantity * stock.purchase_price * (rates[stock.currency] ?? 1)
         }, 0)
         .toFixed(2),
     [state.stocks]

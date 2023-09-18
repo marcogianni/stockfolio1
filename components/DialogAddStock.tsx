@@ -166,7 +166,7 @@ export default function DialogAddStock(props: Props) {
               id="price"
               className="col-span-3 flex-1"
             />
-            <Select value={state.currency} disabled onValueChange={(value) => dispatch({ type: 'SET_CURRENCY', payload: value })}>
+            <Select value={state.currency} onValueChange={(value) => dispatch({ type: 'SET_CURRENCY', payload: value })}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select currency" />
               </SelectTrigger>
