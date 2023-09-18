@@ -14,7 +14,7 @@ type UserStocksContextType = {
     setStocks: (payload: UserStock[]) => void
     addStock: (payload: UserStock) => void
     loadStocks: () => void
-    deleteStock: (payload: number) => void
+    deleteStock: (payload: UserStock) => void
   }
   data: {
     totalInvested: number
@@ -39,8 +39,8 @@ const reducer = (state: any, action: any) => {
     case 'DELETE_STOCK':
       return {
         ...state,
-        stocks: state.stocks.filter((stock: UserStock) => stock.id !== action.payload),
-        series: state.series.filter((serie: Serie) => serie.symbol !== action.payload),
+        stocks: state.stocks.filter((stock: UserStock) => stock.id !== action.payload.id),
+        series: state.series.filter((serie: Serie) => serie.symbol !== action.payload.symbol),
       }
     case 'SET_INTERVAL':
       return { ...state, interval: action.payload }
@@ -128,7 +128,7 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
     setSeries: (payload: Serie[]) => dispatch({ type: 'SET_SERIES', payload }),
     setStocks: (payload: UserStock[]) => dispatch({ type: 'SET_STOCKS', payload }),
     addStock: (payload: UserStock) => dispatch({ type: 'ADD_STOCK', payload }),
-    deleteStock: (payload: string) => dispatch({ type: 'DELETE_STOCK', payload }),
+    deleteStock: (payload: UserStock) => dispatch({ type: 'DELETE_STOCK', payload }),
     loadStocks,
   }
 

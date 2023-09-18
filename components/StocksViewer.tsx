@@ -25,7 +25,7 @@ export default function StockViewer() {
     if (error) {
       return toast({ title: 'Error', description: error.message })
     } else {
-      deleteStock(id)
+      deleteStock(stock)
       return toast({ title: 'Success', description: 'Stock deleted successfully' })
     }
   }
@@ -63,7 +63,7 @@ export default function StockViewer() {
               <TooltipProvider delayDuration={100}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" className="ml-2" onClick={() => handleClick(stock.id)}>
+                    <Button variant="outline" size="icon" className="ml-2" onClick={() => handleClick(stock)}>
                       <TrashIcon className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
