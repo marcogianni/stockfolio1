@@ -51,6 +51,6 @@ export interface UserStock {
   instrument_name: string
   quantity: number
   purchase_price: number
-  current_price: number | undefined
+  current_price: number
   mic_code: string
 }

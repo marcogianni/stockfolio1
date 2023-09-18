@@ -18,8 +18,8 @@ export default function StockViewer() {
     return null
   }
 
-  const handleClick = async (id: number) => {
-    const { error } = await supabase.from('user_stocks').delete().eq('id', id)
+  const handleClick = async (stock: UserStock) => {
+    const { error } = await supabase.from('user_stocks').delete().eq('id', stock.id)
     console.debug('handleClick', error)
 
     if (error) {

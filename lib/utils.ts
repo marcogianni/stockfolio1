@@ -38,7 +38,7 @@ export function getSeriesLastPrice(series: Serie[]): LastPrice[] {
 // Combine the stocks with the last price
 export function stocksWithCurrentPrice(lastPriceSeries: LastPrice[], userStocks: SupabaseStock[]): UserStock[] {
   const stocks = userStocks.map((stock) => {
-    const lastPrice = lastPriceSeries.find((serie) => serie.symbol === stock.symbol)?.lastPrice
+    const lastPrice = lastPriceSeries.find((serie: LastPrice) => serie.symbol === stock.symbol)?.lastPrice || 0
     const userStock: UserStock = {
       current_price: lastPrice,
       id: stock.id,
