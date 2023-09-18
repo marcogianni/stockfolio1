@@ -1,8 +1,8 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Stock } from '@/lib/types'
+import { UserStock } from '@/lib/types'
 
-export const columns: ColumnDef<Stock>[] = [
+export const columns: ColumnDef<UserStock>[] = [
   {
     id: 'select',
     cell: ({ table, row }) => {
