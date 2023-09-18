@@ -15,6 +15,8 @@ import DialogAddStock from '@/components/DialogAddStock'
 import { useUserStocks } from '@/contexts/UserStocksContext'
 import { useSupabase } from '@/contexts/SupabaseContext'
 import { UserStock } from '@/lib/types'
+import FormatCurrency from './FormatCurrency'
+import FormatPercentage from './FormatPercentage'
 
 const initialState: UserStock | null = null
 
@@ -58,10 +60,14 @@ export default function Overview() {
       <h2 className="text-3xl font-bold tracking-tight">Overview</h2>
       <div className="grid grid-cols-1 gap-6 mt-6 sm:grid-cols-2 lg:grid-cols-3">
         <OverviewCard title="Stockfolio Value" description="The current value of your stockfolio">
-          <div className="text-2xl font-bold">$ {data?.portfolioValue}</div>
+          <div className="text-2xl font-bold">
+            <FormatCurrency value={data?.portfolioValue} />
+          </div>
         </OverviewCard>
         <OverviewCard title="Total Invested" description="The amount invested for these stocks">
-          <div className="text-2xl font-bold">$ {data?.totalInvested}</div>
+          <div className="text-2xl font-bold">
+            <FormatCurrency value={data?.totalInvested} />
+          </div>
         </OverviewCard>
         <OverviewCard title="Total Profit/Loss" description="The total profit/loss for these stocks">
           <div className="text-2xl font-bold flex items-center" style={{ color: isInProfit ? '#22c55e' : '#e11d48' }}>
@@ -72,7 +78,10 @@ export default function Overview() {
                 transform: isInProfit ? 'rotate(0deg)' : 'rotate(180deg)',
               }}
             />
-            <span>{data?.profitLoss.replace('-', '')}%</span>
+            <span>
+              {' '}
+              <FormatPercentage value={data?.profitLoss.replace('-', '')} />
+            </span>
           </div>
         </OverviewCard>
       </div>

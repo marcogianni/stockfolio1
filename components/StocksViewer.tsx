@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Pencil1Icon, TrashIcon } from '@radix-ui/react-icons'
 import { toast } from '@/components/ui/use-toast'
+import FormatCurrency from './FormatCurrency'
 
 type Props = {
   handleEditStock: (stock: UserStock) => void
@@ -16,6 +17,7 @@ type Props = {
 export default function StockViewer(props: Props) {
   const { stocks, actions } = useUserStocks()
   const { supabase } = useSupabase()
+
   const { deleteStock } = actions
 
   if (stocks.length === 0) {
@@ -54,11 +56,15 @@ export default function StockViewer(props: Props) {
 
             <div className="md:flex-1">
               <div className="text-sm">Purchase Price</div>
-              <div className="text-lg font-bold">$ {stock.purchase_price}</div>
+              <div className="text-lg font-bold">
+                <FormatCurrency value={stock.purchase_price} />
+              </div>
             </div>
             <div className="md:flex-1">
               <div className="text-sm">Current Price</div>
-              <div className="text-lg font-bold">$ {stock.current_price}</div>
+              <div className="text-lg font-bold">
+                <FormatCurrency value={stock.current_price} />
+              </div>
             </div>
             <div className="flex justify-end flex-1">
               <TooltipProvider delayDuration={100}>
