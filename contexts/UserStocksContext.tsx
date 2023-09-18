@@ -21,6 +21,7 @@ type UserStocksContextType = {
     portfolioValue: number
     profitLoss: string
   }
+  exchangeRates: {}
 }
 
 export const UserStocksContext = createContext({} as UserStocksContextType)
@@ -139,7 +140,7 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <UserStocksContext.Provider value={{ series: state.series, stocks: state.stocks, actions, data }}>
+    <UserStocksContext.Provider value={{ series: state.series, stocks: state.stocks, exchangeRates: state.exchangeRates, actions, data }}>
       {children}
     </UserStocksContext.Provider>
   )

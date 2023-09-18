@@ -28,8 +28,8 @@ const initialState = {
   results: [],
   loading: false,
   selected: null,
-  quantity: undefined,
-  price: undefined,
+  quantity: 0,
+  price: 0,
   currency: 'USD',
   error: null,
 }
