@@ -1,4 +1,6 @@
-import { useMemo } from 'react'
+'use client'
+
+import { useCallback, useMemo, useState } from 'react'
 
 import { TriangleUpIcon } from '@radix-ui/react-icons'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -8,27 +10,40 @@ import OverviewCard from '@/components/OverviewCard'
 import PortfolioLineChart from '@/components/PortfolioLineChart'
 import PortfolioDoughnutChart from '@/components/PortfolioDoughnutChart'
 import StockViewer from '@/components/StocksViewer'
+import DialogAddStock from '@/components/DialogAddStock'
 
 import { useUserStocks } from '@/contexts/UserStocksContext'
 import { useSupabase } from '@/contexts/SupabaseContext'
+import { UserStock } from '@/lib/types'
 
-type Props = {
-  handleOpenDialog: () => void
-}
+const initialState: UserStock | null = null
 
-export default function Overview(props: Props) {
+export default function Overview() {
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [editingStock, setEditingStock] = useState(initialState)
+
   const { data, stocks } = useUserStocks()
   const { user } = useSupabase()
 
   const isInProfit = useMemo(() => Number(data?.profitLoss) > 0, [data.profitLoss])
+
+  const handleClose = useCallback(() => {
+    setEditingStock(null)
+    setDialogOpen(false)
+  }, [])
+
+  const handleEditStock = useCallback((stock: UserStock) => {
+    setEditingStock(stock)
+    setDialogOpen(true)
+  }, [])
 
   const isLoggedIn = useMemo(() => {
     if (!user) return false
     return true
   }, [user])
 
-  if (stocks.length === 0 || !isLoggedIn) {
-    return <Empty handleOpenDialog={props.handleOpenDialog} isLoggedIn={isLoggedIn} />
+  if (stocks.length === 0 && isLoggedIn) {
+    return <Empty handleOpenDialog={() => setDialogOpen(true)} isLoggedIn={isLoggedIn} />
   }
 
   return (
@@ -68,15 +83,16 @@ export default function Overview(props: Props) {
             <CardTitle className="mb-0">
               <div className="flex justify-between items-center">
                 <span>Stocks</span>
-                <Button onClick={props.handleOpenDialog}>Add Stocks</Button>
+                <Button onClick={() => setDialogOpen(true)}>Add Stocks</Button>
               </div>
             </CardTitle>
             <CardContent className="p-0">
-              <StockViewer />
+              <StockViewer handleEditStock={handleEditStock} />
             </CardContent>
           </CardHeader>
         </Card>
       </div>
+      <DialogAddStock open={dialogOpen} onClose={handleClose} editingStock={editingStock} />
     </div>
   )
 }

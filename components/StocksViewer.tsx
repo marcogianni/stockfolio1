@@ -9,18 +9,22 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Pencil1Icon, TrashIcon } from '@radix-ui/react-icons'
 import { toast } from '@/components/ui/use-toast'
 
-export default function StockViewer() {
+type Props = {
+  handleEditStock: (stock: UserStock) => void
+}
+
+export default function StockViewer(props: Props) {
   const { stocks, actions } = useUserStocks()
-  const { supabase, user } = useSupabase()
+  const { supabase } = useSupabase()
   const { deleteStock } = actions
 
   if (stocks.length === 0) {
     return null
   }
 
-  const handleClick = async (stock: UserStock) => {
+  const handleDelete = async (stock: UserStock) => {
     const { error } = await supabase.from('user_stocks').delete().eq('id', stock.id)
-    console.debug('handleClick', error)
+    console.debug('handleDelete', error)
 
     if (error) {
       return toast({ title: 'Error', description: error.message })
@@ -57,13 +61,23 @@ export default function StockViewer() {
               <div className="text-lg font-bold">$ {stock.current_price}</div>
             </div>
             <div className="flex justify-end flex-1">
-              <Button variant="outline" size="icon">
-                <Pencil1Icon className="h-4 w-4" />
-              </Button>
               <TooltipProvider delayDuration={100}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" className="ml-2" onClick={() => handleClick(stock)}>
+                    <Button variant="outline" size="icon" onClick={() => props.handleEditStock(stock)}>
+                      <Pencil1Icon className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Delete Stock</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider delayDuration={100}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" size="icon" className="ml-2" onClick={() => handleDelete(stock)}>
                       <TrashIcon className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
