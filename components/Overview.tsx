@@ -28,8 +28,10 @@ export default function Overview() {
   const isInProfit = useMemo(() => Number(data?.profitLoss) > 0, [data.profitLoss])
 
   const handleClose = useCallback(() => {
-    setEditingStock(null)
     setDialogOpen(false)
+    setTimeout(() => {
+      setEditingStock(null)
+    }, 200)
   }, [])
 
   const handleEditStock = useCallback((stock: UserStock) => {
@@ -42,8 +44,13 @@ export default function Overview() {
     return true
   }, [user])
 
-  if (stocks.length === 0 && isLoggedIn) {
-    return <Empty handleOpenDialog={() => setDialogOpen(true)} isLoggedIn={isLoggedIn} />
+  if (stocks.length === 0) {
+    return (
+      <>
+        <Empty handleOpenDialog={() => setDialogOpen(true)} isLoggedIn={isLoggedIn} />
+        <DialogAddStock open={dialogOpen} onClose={handleClose} editingStock={null} />
+      </>
+    )
   }
 
   return (

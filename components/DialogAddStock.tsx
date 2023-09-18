@@ -23,13 +23,24 @@ type Props = {
   editingStock: UserStock | null
 }
 
-const initialState = {
+type InitialStateType = {
+  query: string
+  results: any[]
+  loading: boolean
+  selected: any
+  quantity: number | null
+  price: number | null
+  currency: string
+  error: string | null
+}
+
+const initialState: InitialStateType = {
   query: '',
   results: [],
   loading: false,
   selected: null,
-  quantity: 0,
-  price: 0,
+  quantity: null,
+  price: null,
   currency: 'USD',
   error: null,
 }
@@ -151,7 +162,7 @@ export default function DialogAddStock(props: Props) {
           <Separator />
           <Input
             onChange={handleChangeQuantity}
-            defaultValue={editingStock?.quantity ?? state.quantity}
+            defaultValue={editingStock?.quantity.toString() ?? state?.quantity?.toString()}
             type="number"
             placeholder="Insert quantity"
             id="quantity"
@@ -160,7 +171,7 @@ export default function DialogAddStock(props: Props) {
           <div className="flex items-center space-x-2 mt-3">
             <Input
               onChange={handleChangePrice}
-              defaultValue={editingStock?.purchase_price ?? state.price}
+              defaultValue={editingStock?.purchase_price.toString() ?? state.price?.toString()}
               type="number"
               placeholder="Insert purchase price"
               id="price"

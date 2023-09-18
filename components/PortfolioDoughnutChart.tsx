@@ -11,7 +11,12 @@ const options = {
   responsive: true,
   maintainAspectRatio: false,
   colors: {
-    enabled: false,
+    enabled: true,
+  },
+  plugins: {
+    colors: {
+      forceOverride: true,
+    },
   },
 }
 
