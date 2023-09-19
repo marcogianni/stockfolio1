@@ -25,7 +25,7 @@ export default function Header() {
             <span className="font-bold sm:inline-block">Stockfolio1</span>
           </Link>
           <nav className="md:flex hidden items-center space-x-6 text-sm font-medium">
-            <Link href="/dashboard" className="transition-colors hover:text-foreground/80 text-foreground/80">
+            <Link href="/" className="transition-colors hover:text-foreground/80 text-foreground/80">
               Dashboard
             </Link>
           </nav>
