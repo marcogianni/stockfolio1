@@ -7,6 +7,7 @@ const nextConfig = {
     NEXT_RAPIDAPI_HOST: process.env.NEXT_RAPIDAPI_HOST,
     NEXT_TWELVEDATA: process.env.NEXT_TWELVEDATA,
     NEXT_FREECURRENCYAPI: process.env.NEXT_FREECURRENCYAPI,
+    NEXT_FINNHUB: process.env.NEXT_FINNHUB,
   },
 }
 

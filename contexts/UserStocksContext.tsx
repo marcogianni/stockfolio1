@@ -6,6 +6,8 @@ import { timeSeries } from '@/api/twelvedata'
 import { LastPrice, Serie, UserStock, SupabaseStock } from '@/lib/types'
 import { getSeriesLastPrice, marshalTwelveDataSeries, stocksWithCurrentPrice } from '@/lib/utils'
 import { useExchangeRates } from './ExchangeRates'
+import { useToast } from '@/components/ui/use-toast'
+import { stockOverview } from '@/api/alphavantage'
 
 type UserStocksContextType = {
   series: Serie[]
@@ -58,11 +60,10 @@ const initialState = {
 }
 
 export const UserStocksProvider = ({ children }: { children: React.ReactNode }) => {
+  const { toast } = useToast()
   const [state, dispatch] = useReducer(reducer, initialState)
   const { supabase, user } = useSupabase()
   const { rates } = useExchangeRates()
-
-  console.debug('RATES', rates)
 
   const totalInvested: number = useMemo(
     () =>
@@ -103,21 +104,51 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
       // Combine the stocks with the last price
       const stocksWithPrice = stocksWithCurrentPrice(lastPriceSeries, data)
 
+      // const infos = await loadStockInformations(data)
+
       dispatch({ type: 'SET_STOCKS', payload: stocksWithPrice })
       dispatch({ type: 'SET_SERIES', payload: series })
     }
   }
 
   const loadSeries = async (stocks: SupabaseStock[]) => {
-    // Get the series for each stock
-    const promises = stocks.map(async (stock: SupabaseStock) => {
-      const { values } = await timeSeries(stock.symbol, state.interval)
-      return { symbol: stock.symbol, data: values ?? null }
-    })
+    try {
+      // Get the series for each stock
+      const promises = stocks.map(async (stock: SupabaseStock) => {
+        const { values } = await timeSeries(stock.symbol, state.interval)
+        return { symbol: stock.symbol, data: values ?? null }
+      })
 
-    const series: Serie[] = await Promise.all(promises)
-    const cleanedSeries = marshalTwelveDataSeries(series)
-    return cleanedSeries
+      const series: Serie[] = await Promise.all(promises)
+      const cleanedSeries = marshalTwelveDataSeries(series)
+      return cleanedSeries
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: 'Error loading time series',
+      })
+      return []
+    }
+  }
+
+  const loadStockInformations = async (stocks: UserStock[]) => {
+    try {
+      const promises = stocks.map(async (stock: UserStock) => {
+        const response = await stockOverview(stock.symbol)
+        return response
+      })
+
+      const stockInformations = await Promise.all(promises)
+
+      console.debug(stockInformations)
+      return stockInformations
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: 'Error loading stock informations',
+      })
+      return []
+    }
   }
 
   useEffect(() => {
