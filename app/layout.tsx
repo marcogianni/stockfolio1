@@ -42,10 +42,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <UserStocksProvider>
                   <Header />
                   {children}
+                  <Toaster />
                 </UserStocksProvider>
               </ExchangeRatesProvider>
             </SupabaseProvider>
-            <Toaster />
           </ThemeProvider>
         </SplashScreenWrapper>
       </body>

@@ -53,4 +53,5 @@ export interface UserStock {
   purchase_price: number
   current_price: number
   mic_code: string
+  industry: string | null
 }

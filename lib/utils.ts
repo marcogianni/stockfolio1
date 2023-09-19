@@ -50,6 +50,7 @@ export function stocksWithCurrentPrice(lastPriceSeries: LastPrice[], userStocks:
       quantity: stock.quantity,
       purchase_price: stock.purchase_price,
       mic_code: stock.mic_code,
+      industry: null,
     }
     return userStock
   })

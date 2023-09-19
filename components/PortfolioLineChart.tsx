@@ -25,6 +25,9 @@ export const options = {
     legend: {
       position: 'top' as const,
     },
+    tooltip: {
+      intersect: false,
+    },
     title: {
       display: false,
     },

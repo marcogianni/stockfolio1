@@ -17,6 +17,9 @@ const options = {
     colors: {
       forceOverride: true,
     },
+    tooltip: {
+      intersect: false,
+    },
   },
 }
 
