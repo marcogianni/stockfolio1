@@ -24,11 +24,11 @@ export default function Header() {
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <span className="font-bold sm:inline-block">Stockfolio1</span>
           </Link>
-          <nav className="md:flex hidden items-center space-x-6 text-sm font-medium">
+          {/* <nav className="md:flex hidden items-center space-x-6 text-sm font-medium">
             <Link href="/" className="transition-colors hover:text-foreground/80 text-foreground/80">
               Dashboard
             </Link>
-          </nav>
+          </nav> */}
         </div>
 
         <div className="flex flex-1 items-center space-x-2 justify-end">

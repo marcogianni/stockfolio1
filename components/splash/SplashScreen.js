@@ -3,8 +3,8 @@ import { RaceBy } from '@uiball/loaders'
 export default function SplashScreen() {
   return (
     <div
-      className="splash-screen top-0 fixed bg-black w-full min-h-screen flex justify-center items-center z-100"
-      style={{ zIndex: 100, background: 'black' }}
+      className="splash-screen top-0 bottom-0 fixed bg-black w-full min-h-screen flex justify-center items-center z-100"
+      style={{ zIndex: 100, background: 'black', height: '100vh' }}
     >
       <div className="p-10 rounded-xl relative flex justify-center flex-col">
         <div className="flex justify-center flex-col items-center" style={{ width: 180 }}>

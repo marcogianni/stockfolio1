@@ -21,8 +21,6 @@ export function DataTable<TData, TValue>({ data, columns, dispatch }: DataTableP
 
   const selected = table.getRowModel().rows.filter((row) => row.getIsSelected())[0]?.['original'] ?? null
 
-  console.debug('Rendering DataTable')
-
   useEffect(() => {
     dispatch({ type: 'SET_SELECTED', payload: selected })
   }, [selected])
