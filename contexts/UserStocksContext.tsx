@@ -7,6 +7,7 @@ import { LastPrice, Serie, UserStock, SupabaseStock } from '@/lib/types'
 import { getSeriesLastPrice, marshalTwelveDataSeries, stocksWithCurrentPrice } from '@/lib/utils'
 import { useExchangeRates } from './ExchangeRates'
 import { useToast } from '@/components/ui/use-toast'
+import { stockOverview } from '@/api/alphavantage'
 
 type UserStocksContextType = {
   series: Serie[]
@@ -64,8 +65,6 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
   const { supabase, user } = useSupabase()
   const { rates } = useExchangeRates()
 
-  console.debug('RATES', rates)
-
   const totalInvested: number = useMemo(
     () =>
       state.stocks
@@ -105,6 +104,8 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
       // Combine the stocks with the last price
       const stocksWithPrice = stocksWithCurrentPrice(lastPriceSeries, data)
 
+      // const infos = await loadStockInformations(data)
+
       dispatch({ type: 'SET_STOCKS', payload: stocksWithPrice })
       dispatch({ type: 'SET_SERIES', payload: series })
     }
@@ -125,6 +126,26 @@ export const UserStocksProvider = ({ children }: { children: React.ReactNode }) 
       toast({
         title: 'Error',
         description: 'Error loading time series',
+      })
+      return []
+    }
+  }
+
+  const loadStockInformations = async (stocks: UserStock[]) => {
+    try {
+      const promises = stocks.map(async (stock: UserStock) => {
+        const response = await stockOverview(stock.symbol)
+        return response
+      })
+
+      const stockInformations = await Promise.all(promises)
+
+      console.debug(stockInformations)
+      return stockInformations
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: 'Error loading stock informations',
       })
       return []
     }
